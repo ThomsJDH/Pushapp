@@ -270,13 +270,27 @@ function updateCalendar() {
 
 // Navigation du calendrier
 document.getElementById('prevMonth').addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    updateCalendar();
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() - 1);
+    
+    // Vérifier si la nouvelle date est après la date de début
+    const start = new Date(startDate);
+    if (newDate.getTime() >= start.getTime()) {
+        currentDate = newDate;
+        updateCalendar();
+    }
 });
 
 document.getElementById('nextMonth').addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    updateCalendar();
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() + 1);
+    
+    // Vérifier si la nouvelle date n'est pas dans le futur
+    const now = new Date();
+    if (newDate.getTime() <= now.getTime()) {
+        currentDate = newDate;
+        updateCalendar();
+    }
 });
 
 // Initialisation
@@ -413,11 +427,19 @@ window.addEventListener('load', detectiOS);
 // Vérifier si un jour est passé depuis la dernière visite
 function verifierJour() {
     const aujourdhui = getLocalDateString();
+    const maintenant = new Date();
+    const dernierJourDate = new Date(dernierJour);
+    
+    // Vérifier si nous avons changé de mois
+    const moisChange = maintenant.getMonth() !== dernierJourDate.getMonth() || 
+                      maintenant.getFullYear() !== dernierJourDate.getFullYear();
+    
     if (aujourdhui !== dernierJour) {
         console.log('Changement de jour détecté');
         console.log('Ancien jour:', dernierJour);
         console.log('Nouveau jour:', aujourdhui);
         console.log('Fuseau horaire:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+        console.log('Changement de mois:', moisChange);
         
         // Réinitialiser la case à cocher pour le nouveau jour
         completedCheckbox.checked = false;
@@ -430,6 +452,11 @@ function verifierJour() {
         // Sauvegarder les nouvelles valeurs
         localStorage.setItem('dernierJour', dernierJour);
         localStorage.setItem('nombre', nombre);
+        
+        // Si nous avons changé de mois, mettre à jour la date courante du calendrier
+        if (moisChange) {
+            currentDate = new Date();
+        }
     }
     
     // Mettre à jour l'affichage
