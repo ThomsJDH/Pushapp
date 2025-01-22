@@ -54,61 +54,86 @@ const translations = {
 // Langue par défaut
 let currentLang = localStorage.getItem('language') || 'fr';
 
-// Fonction pour mettre à jour la langue active dans l'interface
-function updateActiveLanguageButton() {
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === currentLang);
-    });
-}
+// Date de début fixe
+const START_DATE = '2025-01-01';
 
-// Fonction pour traduire l'interface
-function translateUI() {
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-        const key = element.getAttribute('data-i18n');
-        if (translations[currentLang][key]) {
-            if (key === 'day') {
-                element.textContent = `${translations[currentLang][key]} ${nombre}`;
-            } else {
-                element.textContent = translations[currentLang][key];
-            }
-        }
-    });
-    
-    // Mettre à jour les jours de la semaine dans le calendrier
-    document.querySelectorAll('.weekday').forEach((element, index) => {
-        element.textContent = translations[currentLang].weekdays[index];
-    });
-    
-    updateActiveLanguageButton();
-    updateCalendar(); // Mettre à jour le calendrier après la traduction
-}
-
-// Fonction pour obtenir la date locale au format YYYY-MM-DD
+// Fonction pour obtenir la date locale
 function getLocalDateString() {
-    const now = new Date();
-    const timeZoneOffset = now.getTimezoneOffset();
-    const localDate = new Date(now.getTime() - (timeZoneOffset * 60000));
+    const localDate = new Date();
     return localDate.toISOString().split('T')[0];
 }
 
-// Initialiser ou récupérer les données sauvegardées
-let startDate = '2025-01-01'; // Date de début corrigée pour 2025
+// Fonction pour calculer le nombre de jours depuis le début
+function calculateDayNumber() {
+    const today = new Date();
+    const start = new Date(START_DATE);
+    const diffTime = Math.abs(today - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+}
+
+// Fonction pour sauvegarder les données
+function saveData() {
+    localStorage.setItem('completedDays', JSON.stringify(completedDays));
+    localStorage.setItem('completedToday', completedCheckbox.checked);
+    localStorage.setItem('dernierJour', dernierJour);
+    localStorage.setItem('nombre', nombre.toString());
+    localStorage.setItem('lastUpdate', getLocalDateString());
+}
+
+// Fonction pour charger les données
+function loadData() {
+    try {
+        dernierJour = localStorage.getItem('dernierJour') || getLocalDateString();
+        completedDays = JSON.parse(localStorage.getItem('completedDays')) || {};
+        nombre = parseInt(localStorage.getItem('nombre')) || calculateDayNumber();
+        
+        // Vérifier si nous avons changé de jour
+        const aujourdhui = getLocalDateString();
+        if (dernierJour !== aujourdhui) {
+            nombre = calculateDayNumber();
+            dernierJour = aujourdhui;
+            completedCheckbox.checked = false;
+            saveData();
+        } else {
+            completedCheckbox.checked = localStorage.getItem('completedToday') === 'true';
+        }
+        
+        updateDisplay();
+    } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+        // Réinitialiser en cas d'erreur
+        resetData();
+    }
+}
+
+// Fonction pour réinitialiser les données
+function resetData() {
+    nombre = calculateDayNumber();
+    dernierJour = getLocalDateString();
+    completedDays = {};
+    completedCheckbox.checked = false;
+    saveData();
+    updateDisplay();
+}
+
+// Fonction pour mettre à jour l'affichage
+function updateDisplay() {
+    const nombreElement = document.getElementById('nombre');
+    const jourElement = document.getElementById('jour');
+    
+    nombreElement.textContent = nombre;
+    jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
+    
+    updateTotalDisplay();
+    updateCalendar();
+}
+
+// Initialisation ou récupération des données sauvegardées
+let startDate = START_DATE; 
 let nombre = 1;
 let dernierJour = localStorage.getItem('dernierJour') || getLocalDateString();
 let completedDays = JSON.parse(localStorage.getItem('completedDays')) || {};
-
-// Calculer le nombre de jours depuis le début
-function calculateDayNumber() {
-    const now = new Date();
-    const timeZoneOffset = now.getTimezoneOffset();
-    const localNow = new Date(now.getTime() - (timeZoneOffset * 60000));
-    
-    // On utilise directement le jour du mois
-    const day = localNow.getDate();
-    console.log('Jour du mois:', day);
-    
-    return day;
-}
 
 // Calculer le nombre de jours pour une date spécifique
 function calculateDayNumberForDate(date) {
@@ -173,8 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         console.log('CompletedDays après:', completedDays);
-        localStorage.setItem('completedDays', JSON.stringify(completedDays));
-        localStorage.setItem('completedToday', completedCheckbox.checked);
+        saveData();
         updateTotalDisplay();
         updateCalendar();
     });
@@ -525,13 +549,12 @@ function updateCalendar() {
                     dayElement.classList.add('completed');
                 }
                 
-                localStorage.setItem('completedDays', JSON.stringify(completedDays));
+                saveData();
                 updateTotalDisplay();
                 
                 // Mettre à jour la case à cocher si c'est aujourd'hui
                 if (dateString === today) {
                     completedCheckbox.checked = !completedCheckbox.checked;
-                    localStorage.setItem('completedToday', completedCheckbox.checked);
                 }
             });
         }
@@ -656,15 +679,13 @@ function verifierJour() {
         
         // Réinitialiser la case à cocher pour le nouveau jour
         completedCheckbox.checked = false;
-        localStorage.setItem('completedToday', 'false');
         
         // Mettre à jour le dernier jour
         dernierJour = aujourdhui;
         nombre = calculateDayNumber();
         
         // Sauvegarder les nouvelles valeurs
-        localStorage.setItem('dernierJour', dernierJour);
-        localStorage.setItem('nombre', nombre);
+        saveData();
         
         // Si nous avons changé de mois, mettre à jour la date courante du calendrier
         if (moisChange) {
@@ -689,7 +710,6 @@ window.addEventListener('load', () => {
     if (localStorage.getItem('lastUpdate') !== getLocalDateString()) {
         localStorage.setItem('lastUpdate', getLocalDateString());
         nombre = calculateDayNumber();
-        localStorage.setItem('nombre', nombre);
         
         // Mettre à jour l'affichage
         const nombreElement = document.getElementById('nombre');
@@ -697,5 +717,22 @@ window.addEventListener('load', () => {
         nombreElement.textContent = nombre;
         jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
         updateCalendar();
+    }
+});
+
+// Sauvegarder les données avant de fermer la page
+window.addEventListener('beforeunload', () => {
+    saveData();
+});
+
+// Sauvegarder périodiquement
+setInterval(saveData, 30000); // Sauvegarde toutes les 30 secondes
+
+// Gérer les changements de visibilité de la page
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+        saveData();
+    } else {
+        loadData();
     }
 });
