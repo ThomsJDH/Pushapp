@@ -343,3 +343,21 @@ label {
         opacity: 1;
     }
 }
+
+.description {
+    color: #a0a0a0;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 20px auto;
+    max-width: 600px;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.author {
+    color: #007AFF;
+    font-size: 1rem;
+    margin: 10px 0 30px;
+    text-align: center;
+    font-style: italic;
+}

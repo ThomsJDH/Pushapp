@@ -1,6 +1,14 @@
 # App Push-ups - Challenge 365 jours
 
-Une application web progressive (PWA) pour suivre votre défi de push-ups sur 365 jours.
+Une application web progressive (PWA) pour suivre votre défi de push-ups sur 365 jours. Commencez doucement et progressez chaque jour pour atteindre vos objectifs de fitness !
+
+## À propos
+
+Créé par Thomas, cette application simple et efficace vous aide à :
+- Suivre votre progression quotidienne
+- Visualiser votre historique sur un calendrier interactif
+- Calculer votre total de push-ups
+- Partager vos réussites
 
 ## Fonctionnalités
 
@@ -34,6 +42,10 @@ Le fichier `netlify.toml` contient déjà toute la configuration nécessaire.
 1. Clonez le dépôt
 2. Ouvrez `index.html` dans votre navigateur
 3. Pour le développement, utilisez un serveur local comme Live Server dans VS Code
+
+## Auteur
+
+Créé avec ❤️ par Thomas
 
 ## Licence
 

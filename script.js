@@ -11,19 +11,27 @@ function getLocalDateString() {
 }
 
 // Initialiser ou récupérer les données sauvegardées
-let nombre = parseInt(localStorage.getItem('nombre')) || 21;
+let startDate = localStorage.getItem('startDate') || '2025-01-01';
+let nombre = 1;
 let dernierJour = localStorage.getItem('dernierJour') || getLocalDateString();
 let completedDays = JSON.parse(localStorage.getItem('completedDays')) || {};
 
-// Sauvegarder les valeurs initiales si elles n'existent pas
-if (!localStorage.getItem('nombre')) {
-    localStorage.setItem('nombre', nombre);
+// Calculer le nombre de jours depuis le début
+function calculateDayNumber() {
+    const start = new Date(startDate);
+    const today = new Date();
+    const diffTime = Math.abs(today - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
 }
-if (!localStorage.getItem('dernierJour')) {
-    localStorage.setItem('dernierJour', dernierJour);
-}
-if (!localStorage.getItem('completedDays')) {
-    localStorage.setItem('completedDays', JSON.stringify(completedDays));
+
+// Initialiser le jour actuel
+nombre = calculateDayNumber();
+localStorage.setItem('nombre', nombre);
+
+// Sauvegarder la date de début si elle n'existe pas
+if (!localStorage.getItem('startDate')) {
+    localStorage.setItem('startDate', startDate);
 }
 
 const nombreElement = document.getElementById('nombre');
@@ -34,17 +42,18 @@ const totalPushups = document.getElementById('totalPushups');
 // Vérifier si un jour est passé depuis la dernière visite
 function verifierJour() {
     const aujourdhui = getLocalDateString();
-    if (aujourdhui !== dernierJour && nombre < 365) {
+    if (aujourdhui !== dernierJour) {
         // Réinitialiser la case à cocher pour le nouveau jour
         completedCheckbox.checked = false;
         localStorage.setItem('completedToday', 'false');
         
-        nombre++;
+        // Mettre à jour le dernier jour
         dernierJour = aujourdhui;
+        nombre = calculateDayNumber();
         
         // Sauvegarder les nouvelles valeurs
-        localStorage.setItem('nombre', nombre);
         localStorage.setItem('dernierJour', dernierJour);
+        localStorage.setItem('nombre', nombre);
     }
     
     // Mettre à jour l'affichage
@@ -134,7 +143,7 @@ function updateCalendar() {
             dayElement.classList.add('clickable');
             
             // Calculer le nombre de push-ups pour ce jour
-            const dayNumber = Math.floor((clickableDate - new Date('2025-01-01')) / (1000 * 60 * 60 * 24)) + 1;
+            const dayNumber = calculateDayNumber();
             
             if (completedDays[dateString]) {
                 dayElement.classList.add('completed');

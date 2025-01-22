@@ -15,47 +15,54 @@
 </head>
 <body>
     <div id="compteur">
-        <p id="jour">Jour</p>
-        <h1 id="nombre">0</h1>
-        <p>push-ups</p>
-        <div class="checkbox-container">
-            <input type="checkbox" id="completed" name="completed">
-            <label for="completed">Complété aujourd'hui</label>
-        </div>
+        <div class="container">
+            <h1>Challenge Push-ups</h1>
+            <p class="description">Relevez le défi des push-ups sur 365 jours ! Commencez doucement et progressez chaque jour pour atteindre vos objectifs de fitness. Une application simple et efficace pour suivre votre progression quotidienne.</p>
+            
+            <div class="author">Créé par Thomas</div>
+            
+            <p id="jour">Jour</p>
+            <h1 id="nombre">0</h1>
+            <p>push-ups</p>
+            <div class="checkbox-container">
+                <input type="checkbox" id="completed" name="completed">
+                <label for="completed">Complété aujourd'hui</label>
+            </div>
 
-        <div class="stats-container">
-            <div class="total-pushups">
-                <h3>Total des push-ups</h3>
-                <div id="totalPushups" class="total-number">0</div>
-            </div>
-            
-            <div class="share-container">
-                <button id="shareBtn" class="share-button">
-                    <i class="fas fa-share-alt"></i> Partager ma progression
-                </button>
-                <div id="shareOptions" class="share-options">
-                    <button class="social-button copy" data-platform="copy">
-                        <i class="fas fa-copy"></i> Copier
+            <div class="stats-container">
+                <div class="total-pushups">
+                    <h3>Total des push-ups</h3>
+                    <div id="totalPushups" class="total-number">0</div>
+                </div>
+                
+                <div class="share-container">
+                    <button id="shareBtn" class="share-button">
+                        <i class="fas fa-share-alt"></i> Partager ma progression
                     </button>
+                    <div id="shareOptions" class="share-options">
+                        <button class="social-button copy" data-platform="copy">
+                            <i class="fas fa-copy"></i> Copier
+                        </button>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="calendar-container">
-                <div class="calendar-header">
-                    <button id="prevMonth">&lt;</button>
-                    <h3 id="currentMonth">Janvier 2025</h3>
-                    <button id="nextMonth">&gt;</button>
+                
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button id="prevMonth">&lt;</button>
+                        <h3 id="currentMonth">Janvier 2025</h3>
+                        <button id="nextMonth">&gt;</button>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="weekday">Dim</div>
+                        <div class="weekday">Lun</div>
+                        <div class="weekday">Mar</div>
+                        <div class="weekday">Mer</div>
+                        <div class="weekday">Jeu</div>
+                        <div class="weekday">Ven</div>
+                        <div class="weekday">Sam</div>
+                    </div>
+                    <div id="calendar-days" class="calendar-days"></div>
                 </div>
-                <div class="calendar-grid">
-                    <div class="weekday">Dim</div>
-                    <div class="weekday">Lun</div>
-                    <div class="weekday">Mar</div>
-                    <div class="weekday">Mer</div>
-                    <div class="weekday">Jeu</div>
-                    <div class="weekday">Ven</div>
-                    <div class="weekday">Sam</div>
-                </div>
-                <div id="calendar-days" class="calendar-days"></div>
             </div>
         </div>
     </div>
