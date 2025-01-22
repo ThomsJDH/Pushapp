@@ -460,7 +460,7 @@ label {
 .calendar-day.today {
     border-color: #ff3e3e;
     border-width: 2px;
-    color: #ff3e3e;
+    color: #333;
     font-weight: bold;
 }
 

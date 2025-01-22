@@ -1,8 +1,11 @@
-const CACHE_NAME = 'pushup-cache-v3';
-const STATIC_CACHE_NAME = 'pushup-static-v3';
-const DYNAMIC_CACHE_NAME = 'pushup-dynamic-v3';
+const CACHE_VERSION = 'v4';
+const STATIC_CACHE = `static-${CACHE_VERSION}`;
+const DYNAMIC_CACHE = `dynamic-${CACHE_VERSION}`;
+const APP_SHELL = `app-shell-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
+  '/',
+  '/index.html',
   '/app.html',
   '/style.css',
   '/global.css',
@@ -20,15 +23,17 @@ self.addEventListener('install', event => {
   event.waitUntil(
     Promise.all([
       // Cache statique pour les fichiers essentiels
-      caches.open(STATIC_CACHE_NAME).then(cache => {
-        console.log('Cache statique initialisé');
+      caches.open(STATIC_CACHE).then(cache => {
+        console.log('Mise en cache des ressources statiques');
         return cache.addAll(STATIC_ASSETS);
       }),
-      // Cache dynamique pour les autres ressources
-      caches.open(DYNAMIC_CACHE_NAME)
-    ])
+      // Cache pour l'app shell
+      caches.open(APP_SHELL).then(cache => {
+        console.log('Mise en cache de l\'app shell');
+        return cache.addAll(['/app.html']);
+      })
+    ]).then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 // Activation et nettoyage des anciens caches
@@ -36,12 +41,12 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     Promise.all([
       // Supprimer les anciens caches
-      caches.keys().then(cacheNames => {
+      caches.keys().then(keys => {
         return Promise.all(
-          cacheNames.map(cacheName => {
-            if (![STATIC_CACHE_NAME, DYNAMIC_CACHE_NAME].includes(cacheName)) {
-              console.log('Suppression de l\'ancien cache:', cacheName);
-              return caches.delete(cacheName);
+          keys.map(key => {
+            if (!key.includes(CACHE_VERSION)) {
+              console.log('Suppression de l\'ancien cache:', key);
+              return caches.delete(key);
             }
           })
         );
@@ -52,81 +57,96 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Stratégie de cache : Cache First, puis Network
+// Stratégie de cache : Network First avec fallback sur le cache
 self.addEventListener('fetch', event => {
+  // Ignorer les requêtes non GET
+  if (event.request.method !== 'GET') return;
+
   // Ignorer les requêtes chrome-extension
-  if (event.request.url.startsWith('chrome-extension://')) {
-    return;
-  }
+  if (event.request.url.startsWith('chrome-extension://')) return;
 
-  // Ignorer les requêtes POST
-  if (event.request.method !== 'GET') {
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => {
-        // Retourner la réponse du cache si elle existe
-        if (cachedResponse) {
-          // En parallèle, mettre à jour le cache pour la prochaine fois
-          fetch(event.request)
+  // Stratégie spécifique pour app.html
+  if (event.request.url.includes('/app.html')) {
+    event.respondWith(
+      caches.match(event.request)
+        .then(cachedResponse => {
+          return cachedResponse || fetch(event.request)
             .then(response => {
-              if (response.ok) {
-                caches.open(DYNAMIC_CACHE_NAME)
-                  .then(cache => cache.put(event.request, response));
-              }
-            })
-            .catch(() => {/* Ignorer les erreurs de mise à jour */});
-          
-          return cachedResponse;
+              return caches.open(APP_SHELL)
+                .then(cache => {
+                  cache.put(event.request, response.clone());
+                  return response;
+                });
+            });
+        })
+    );
+    return;
+  }
+
+  // Pour les autres requêtes
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        // Vérifier si la réponse est valide
+        if (!response || response.status !== 200) {
+          throw new Error('Invalid response');
         }
 
-        // Si pas dans le cache, faire la requête réseau
-        return fetch(event.request)
-          .then(response => {
-            if (!response || response.status !== 200) {
-              return response;
-            }
+        // Mettre en cache la réponse
+        const responseToCache = response.clone();
+        caches.open(DYNAMIC_CACHE)
+          .then(cache => {
+            cache.put(event.request, responseToCache);
+          });
 
-            // Mettre en cache la nouvelle réponse
-            const responseToCache = response.clone();
-            caches.open(DYNAMIC_CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          })
-          .catch(error => {
-            // En cas d'erreur réseau, essayer de retourner une page offline
-            if (event.request.headers.get('accept').includes('text/html')) {
-              return caches.match('/offline.html');
+        return response;
+      })
+      .catch(() => {
+        // En cas d'erreur, essayer le cache
+        return caches.match(event.request)
+          .then(cachedResponse => {
+            if (cachedResponse) {
+              return cachedResponse;
             }
-            throw error;
+            
+            // Si la ressource n'est pas dans le cache et qu'on est hors ligne
+            if (event.request.url.includes('/app.html')) {
+              return caches.match('/app.html');
+            }
+            
+            // Pour les autres ressources, retourner une erreur
+            return new Response('Offline', {
+              status: 503,
+              statusText: 'Service Unavailable'
+            });
           });
       })
   );
 });
 
-// Périodiquement nettoyer le cache dynamique
+// Synchronisation en arrière-plan
+self.addEventListener('sync', event => {
+  if (event.tag === 'sync-data') {
+    event.waitUntil(
+      // Synchroniser les données locales avec le serveur
+      syncData()
+    );
+  }
+});
+
+// Nettoyage périodique du cache
 self.addEventListener('periodicsync', event => {
   if (event.tag === 'clean-caches') {
     event.waitUntil(
-      caches.open(DYNAMIC_CACHE_NAME).then(cache => {
-        // Supprimer les entrées plus vieilles que 7 jours
-        cache.keys().then(requests => {
-          requests.forEach(request => {
-            cache.match(request).then(response => {
-              if (response) {
-                const date = new Date(response.headers.get('date'));
-                if (Date.now() - date.getTime() > 7 * 24 * 60 * 60 * 1000) {
-                  cache.delete(request);
-                }
-              }
-            });
-          });
-        });
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            // Ne garder que les caches de la version actuelle
+            if (!cacheName.includes(CACHE_VERSION)) {
+              return caches.delete(cacheName);
+            }
+          })
+        );
       })
     );
   }
