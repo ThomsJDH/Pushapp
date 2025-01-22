@@ -300,6 +300,13 @@ label {
     height: 16px;
 }
 
+.install-instructions .social-icon {
+    vertical-align: middle;
+    margin: 0 5px;
+    width: 24px;
+    height: 24px;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
