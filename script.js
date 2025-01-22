@@ -18,10 +18,11 @@ let completedDays = JSON.parse(localStorage.getItem('completedDays')) || {};
 
 // Calculer le nombre de jours depuis le début
 function calculateDayNumber() {
-    const start = new Date(startDate);
+    const start = new Date('2025-01-01');
     const today = new Date();
-    const diffTime = Math.abs(today - start);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    today.setHours(0, 0, 0, 0); // Réinitialiser les heures pour une comparaison juste
+    const diffTime = today.getTime() - start.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
     return diffDays;
 }
 
@@ -286,4 +287,38 @@ document.querySelectorAll('.social-button').forEach(button => {
         // Cacher les options de partage
         shareOptions.classList.remove('visible');
     });
+});
+
+// Gérer l'installation PWA
+let deferredPrompt;
+const installButton = document.getElementById('installButton');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Empêcher Chrome 67 et versions antérieures d'afficher automatiquement l'invite
+    e.preventDefault();
+    // Stocker l'événement pour qu'il puisse être déclenché plus tard
+    deferredPrompt = e;
+    // Mettre à jour l'interface pour informer l'utilisateur qu'il peut installer l'application
+    installButton.style.display = 'inline-flex';
+});
+
+installButton.addEventListener('click', async () => {
+    if (!deferredPrompt) {
+        return;
+    }
+    // Montrer l'invite
+    deferredPrompt.prompt();
+    // Attendre que l'utilisateur réponde à l'invite
+    const { outcome } = await deferredPrompt.userChoice;
+    // On n'a plus besoin de l'événement
+    deferredPrompt = null;
+    // Cacher le bouton
+    installButton.style.display = 'none';
+});
+
+window.addEventListener('appinstalled', () => {
+    // Cacher le bouton d'installation
+    installButton.style.display = 'none';
+    // Effacer le deferredPrompt
+    deferredPrompt = null;
 });

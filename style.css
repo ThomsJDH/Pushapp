@@ -361,3 +361,27 @@ label {
     text-align: center;
     font-style: italic;
 }
+
+.install-button {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px auto;
+    transition: all 0.3s ease;
+}
+
+.install-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.install-button i {
+    font-size: 1.2rem;
+}
