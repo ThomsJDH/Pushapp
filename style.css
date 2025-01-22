@@ -320,58 +320,117 @@ label {
 /* Tabs */
 .tabs {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 5px;
-    border-radius: 10px;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
 }
 
 .tab-button {
-    flex: 1;
-    padding: 12px 20px;
-    font-size: 1rem;
-    font-weight: 500;
-    background: transparent;
+    background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.7);
+    padding: 0.5rem 1rem;
+    color: var(--text-color);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab-button.active {
+    border-bottom-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Share buttons */
+.share-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.share-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background: var(--accent-color);
+    border: none;
     border-radius: 8px;
+    color: white;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.tab-button:hover {
+.share-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.share-options {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.social-button:hover {
+    background: var(--hover-color);
+}
+
+.social-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent-color);
     color: white;
-    background: rgba(255, 255, 255, 0.1);
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+    z-index: 1000;
 }
 
-.tab-button.active {
-    background: #ff3e3e;
-    color: white;
+@keyframes slideUp {
+    from {
+        transform: translate(-50%, 100%);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
 }
 
-/* Tab Content */
-.tab-content {
-    position: relative;
-    min-height: 300px;
-}
-
-.tab-pane {
-    display: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.tab-pane.active {
-    display: block;
-    opacity: 1;
-}
-
-/* Chart */
-#progressChart {
-    width: 100% !important;
-    height: 250px !important;
-    margin: 0 auto;
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+    }
 }
 
 /* Calendar */

@@ -73,74 +73,79 @@
                 <label for="completed" data-i18n="completed">Complété aujourd'hui</label>
             </div>
 
-            
-            <div class="stats-container">
-                <div class="total-pushups">
-                    <h3 data-i18n="total-pushups">Total des push-ups</h3>
-                    <div id="totalPushups" class="total-number">0</div>
-                </div>
-                
-                <div class="share-container">
-                    <button id="shareBtn" class="share-button">
-                        <svg class="social-icon" viewBox="0 0 24 24" width="16" height="16">
-                            <path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
-                        </svg>
-                        <span data-i18n="share">Partager ma progression</span>
-                    </button>
-                    <div id="shareOptions" class="share-options">
-                        <button class="social-button" data-platform="copy">
+            <div class="tabs">
+                <button class="tab-button active" data-tab="stats">Statistiques</button>
+                <button class="tab-button" data-tab="share">Partager</button>
+            </div>
+
+            <div class="tab-content active" id="stats-tab">
+                <div class="stats-container">
+                    <div class="total-pushups">
+                        <h3 data-i18n="total-pushups">Total des push-ups</h3>
+                        <div id="totalPushups" class="total-number">0</div>
+                    </div>
+                    
+                    <div class="share-container">
+                        <button id="shareBtn" class="share-button">
                             <svg class="social-icon" viewBox="0 0 24 24" width="16" height="16">
-                                <path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                                <path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
                             </svg>
-                            <span data-i18n="copy">Copier</span>
+                            <span data-i18n="share">Partager ma progression</span>
                         </button>
+                        <div id="shareOptions" class="share-options">
+                            <button class="social-button" data-platform="copy">
+                                <svg class="social-icon" viewBox="0 0 24 24" width="16" height="16">
+                                    <path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                                </svg>
+                                <span data-i18n="copy">Copier</span>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="calendar-container">
-                    <div class="calendar-header">
-                        <button id="prevMonth" class="calendar-nav">←</button>
-                        <span id="currentMonth"></span>
-                        <button id="nextMonth" class="calendar-nav">→</button>
+                    
+                    <div class="calendar-container">
+                        <div class="calendar-header">
+                            <button id="prevMonth" class="calendar-nav">←</button>
+                            <span id="currentMonth"></span>
+                            <button id="nextMonth" class="calendar-nav">→</button>
+                        </div>
+                        <div class="calendar-grid">
+                            <div class="weekday">Dim</div>
+                            <div class="weekday">Lun</div>
+                            <div class="weekday">Mar</div>
+                            <div class="weekday">Mer</div>
+                            <div class="weekday">Jeu</div>
+                            <div class="weekday">Ven</div>
+                            <div class="weekday">Sam</div>
+                        </div>
+                        <div id="calendar-days" class="calendar-days"></div>
                     </div>
-                    <div class="calendar-grid">
-                        <div class="weekday">Dim</div>
-                        <div class="weekday">Lun</div>
-                        <div class="weekday">Mar</div>
-                        <div class="weekday">Mer</div>
-                        <div class="weekday">Jeu</div>
-                        <div class="weekday">Ven</div>
-                        <div class="weekday">Sam</div>
-                    </div>
-                    <div id="calendar-days" class="calendar-days"></div>
                 </div>
             </div>
 
-            <div class="install-container">
-                <div id="iosInstall" class="install-instructions ios-install" style="display: none;">
-                    <h3 data-i18n="ios-install-title">Pour installer l'application sur iOS :</h3>
-                    <p>
-                        <span data-i18n="ios-install-step1">1. Appuyez sur</span>
-                        <svg class="social-icon" viewBox="0 0 24 24" width="16" height="16">
-                            <path fill="currentColor" d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            <div class="tab-content" id="share-tab">
+                <div class="share-container">
+                    <button class="share-button" id="shareButton">
+                        <svg class="share-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                            <polyline points="16 6 12 2 8 6"></polyline>
+                            <line x1="12" y1="2" x2="12" y2="15"></line>
                         </svg>
-                        <span data-i18n="ios-install-step1-safari">dans Safari</span>
-                    </p>
-                    <p data-i18n="ios-install-step2">2. Choisissez "Sur l'écran d'accueil"</p>
-                </div>
-                <div id="androidInstall" class="install-instructions android-install" style="display: none;">
-                    <h3 data-i18n="android-install-title">Pour installer l'application sur Android :</h3>
-                    <p>
-                        <span data-i18n="android-install-step1">1. Dans Chrome, appuyez sur</span>
-                        <svg class="social-icon" viewBox="0 0 24 24" width="24" height="24">
-                            <circle cx="12" cy="4" r="2" fill="currentColor"/>
-                            <circle cx="12" cy="12" r="2" fill="currentColor"/>
-                            <circle cx="12" cy="20" r="2" fill="currentColor"/>
-                        </svg>
-                        <span data-i18n="android-install-step1-chrome">en haut à droite</span>
-                    </p>
-                    <p data-i18n="android-install-step2">2. Sélectionnez "Installer l'application"</p>
-                    <p data-i18n="android-install-step3">3. Suivez les instructions à l'écran</p>
+                        <span data-i18n="share">Partager ma progression</span>
+                    </button>
+                    <div class="share-options">
+                        <button class="social-button" id="copyButton">
+                            <svg class="social-icon" viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                            </svg>
+                            <span data-i18n="copy">Copier le texte</span>
+                        </button>
+                        <button class="social-button" id="downloadButton">
+                            <svg class="social-icon" viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                            </svg>
+                            <span data-i18n="download">Télécharger l'image</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -153,7 +158,20 @@
 
     <canvas id="shareCanvas" style="display: none;"></canvas>
     <a id="shareLink" style="display: none;"></a>
-    <script src="script.js"></script>
+    <script>
+        // Enregistrement du service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker enregistré avec succès:', registration);
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de l\'enregistrement du Service Worker:', error);
+                    });
+            });
+        }
+    </script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js')
@@ -218,6 +236,7 @@
             updateWidget();
         }
     </script>
+    <script src="script.js"></script>
     <script>
         // Logique d'installation PWA
         let deferredPrompt;
