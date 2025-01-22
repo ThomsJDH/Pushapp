@@ -89,19 +89,9 @@
                 
                 <div class="calendar-container">
                     <div class="calendar-header">
-                        <button id="prevMonth">
-                            <!-- Left Arrow Icon -->
-                            <svg class="social-icon" viewBox="0 0 512 512" width="16" height="16">
-                                <path fill="currentColor" d="M256 0c-141.16 0-256 114.84-256 256s114.84 256 256 256 256-114.84 256-256-114.84-256-256-256zm0 448c-70.69 0-128-57.31-128-128s57.31-128 128-128 128 57.31 128 128-57.31 128-128 128zm-128-256h256v-64h-256v64z"/>
-                            </svg>
-                        </button>
-                        <h3 id="currentMonth">Janvier 2025</h3>
-                        <button id="nextMonth">
-                            <!-- Right Arrow Icon -->
-                            <svg class="social-icon" viewBox="0 0 512 512" width="16" height="16">
-                                <path fill="currentColor" d="M256 0c141.16 0 256 114.84 256 256s-114.84 256-256 256-256-114.84-256-256 114.84-256 256-256zm0 448c70.69 0 128-57.31 128-128s-57.31-128-128-128-128 57.31-128 128 57.31 128 128 128zm128-256h-256v-64h256v64z"/>
-                            </svg>
-                        </button>
+                        <button id="prevMonth" class="calendar-nav">←</button>
+                        <span id="currentMonth"></span>
+                        <button id="nextMonth" class="calendar-nav">→</button>
                     </div>
                     <div class="calendar-grid">
                         <div class="weekday">Dim</div>
@@ -203,30 +193,6 @@
 
         updateShareableImage();
         setInterval(updateShareableImage, 3600000);
-
-        if (navigator.share) {
-            const shareButton = document.createElement('button');
-            shareButton.textContent = 'Épingler sur l\'écran d\'accueil';
-            shareButton.style.cssText = 'position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 10px 20px; background: #007AFF; color: white; border: none; border-radius: 20px; font-size: 16px;';
-            
-            shareButton.addEventListener('click', async () => {
-                const imageUrl = createShareableImage();
-                const blob = await (await fetch(imageUrl)).blob();
-                const file = new File([blob], 'compteur.png', { type: 'image/png' });
-                
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: 'Compteur Quotidien',
-                        text: 'Épinglez cette image sur votre écran d\'accueil'
-                    });
-                } catch (err) {
-                    console.error('Erreur lors du partage:', err);
-                }
-            });
-            
-            document.body.appendChild(shareButton);
-        }
 
         // Support pour les widgets iOS
         if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.widget) {
