@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Compteur Quotidien</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="supported-color-schemes" content="light dark">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="compteur">
+        <p id="jour">Jour</p>
+        <h1 id="nombre">0</h1>
+        <p>push-ups</p>
+        <div class="checkbox-container">
+            <input type="checkbox" id="completed" name="completed">
+            <label for="completed">Complété aujourd'hui</label>
+        </div>
+
+        <div class="stats-container">
+            <div class="total-pushups">
+                <h3>Total des push-ups</h3>
+                <div id="totalPushups" class="total-number">0</div>
+            </div>
+            
+            <div class="share-container">
+                <button id="shareBtn" class="share-button">
+                    <i class="fas fa-share-alt"></i> Partager ma progression
+                </button>
+                <div id="shareOptions" class="share-options">
+                    <button class="social-button copy" data-platform="copy">
+                        <i class="fas fa-copy"></i> Copier
+                    </button>
+                </div>
+            </div>
+            
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button id="prevMonth">&lt;</button>
+                    <h3 id="currentMonth">Janvier 2025</h3>
+                    <button id="nextMonth">&gt;</button>
+                </div>
+                <div class="calendar-grid">
+                    <div class="weekday">Dim</div>
+                    <div class="weekday">Lun</div>
+                    <div class="weekday">Mar</div>
+                    <div class="weekday">Mer</div>
+                    <div class="weekday">Jeu</div>
+                    <div class="weekday">Ven</div>
+                    <div class="weekday">Sam</div>
+                </div>
+                <div id="calendar-days" class="calendar-days"></div>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="shareCanvas" style="display: none;"></canvas>
+    <a id="shareLink" style="display: none;"></a>
+    <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => console.log('ServiceWorker enregistré'))
+                .catch(error => console.log('Erreur:', error));
+        }
+
+        // Créer une image partageable
+        function createShareableImage() {
+            const canvas = document.getElementById('shareCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = 180;
+            canvas.height = 180;
+            
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 72px -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI"';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const nombre = document.getElementById('nombre').textContent;
+            ctx.fillText(nombre, canvas.width/2, canvas.height/2);
+            
+            ctx.font = 'bold 24px -apple-system, system-ui';
+            ctx.fillText('jours', canvas.width/2, canvas.height/2 + 40);
+            
+            return canvas.toDataURL('image/png');
+        }
+
+        function updateShareableImage() {
+            const imageUrl = createShareableImage();
+            const shareLink = document.getElementById('shareLink');
+            shareLink.href = imageUrl;
+            shareLink.download = 'compteur.png';
+        }
+
+        updateShareableImage();
+        setInterval(updateShareableImage, 3600000);
+
+        if (navigator.share) {
+            const shareButton = document.createElement('button');
+            shareButton.textContent = 'Épingler sur l\'écran d\'accueil';
+            shareButton.style.cssText = 'position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 10px 20px; background: #007AFF; color: white; border: none; border-radius: 20px; font-size: 16px;';
+            
+            shareButton.addEventListener('click', async () => {
+                const imageUrl = createShareableImage();
+                const blob = await (await fetch(imageUrl)).blob();
+                const file = new File([blob], 'compteur.png', { type: 'image/png' });
+                
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Compteur Quotidien',
+                        text: 'Épinglez cette image sur votre écran d\'accueil'
+                    });
+                } catch (err) {
+                    console.error('Erreur lors du partage:', err);
+                }
+            });
+            
+            document.body.appendChild(shareButton);
+        }
+
+        // Support pour les widgets iOS
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.widget) {
+            function updateWidget() {
+                const count = document.getElementById('nombre').textContent;
+                window.webkit.messageHandlers.widget.postMessage({
+                    type: 'updateWidget',
+                    data: {
+                        count: count
+                    }
+                });
+            }
+
+            // Mettre à jour le widget toutes les heures
+            setInterval(updateWidget, 3600000);
+            // Mettre à jour le widget au chargement
+            updateWidget();
+        }
+    </script>
+</body>
+</html>

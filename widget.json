@@ -1,0 +1,17 @@
+{
+    "name": "Compteur Quotidien",
+    "display": "standalone",
+    "widgets": [{
+        "name": "CompteurWidget",
+        "description": "Affiche le nombre de jours",
+        "type": "medium",
+        "families": ["systemSmall", "systemMedium"],
+        "supportedFamilies": ["systemSmall", "systemMedium"],
+        "placeholder": {
+            "text": "21"
+        },
+        "preview": {
+            "text": "21"
+        }
+    }]
+}

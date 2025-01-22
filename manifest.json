@@ -1,0 +1,21 @@
+{
+    "name": "App Push-ups - Challenge 365 jours",
+    "short_name": "App Push-ups",
+    "description": "Suivez votre défi de push-ups sur 365 jours",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1a1a1a",
+    "theme_color": "#007AFF",
+    "icons": [
+        {
+            "src": "icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "orientation": "portrait",
+    "categories": ["fitness", "health", "lifestyle"],
+    "lang": "fr",
+    "dir": "ltr"
+}
