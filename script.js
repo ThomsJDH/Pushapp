@@ -51,414 +51,236 @@ const translations = {
     }
 };
 
-// Langue par défaut
+// Variables globales
 let currentLang = localStorage.getItem('language') || 'fr';
-
-// Fonction pour mettre à jour la langue active dans l'interface
-function updateActiveLanguageButton() {
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === currentLang);
-    });
-}
-
-// Fonction pour traduire l'interface
-function translateUI() {
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-        const key = element.getAttribute('data-i18n');
-        if (translations[currentLang][key]) {
-            if (key === 'day') {
-                element.textContent = `${translations[currentLang][key]} ${nombre}`;
-            } else {
-                element.textContent = translations[currentLang][key];
-            }
-        }
-    });
-    
-    // Mettre à jour les jours de la semaine dans le calendrier
-    document.querySelectorAll('.weekday').forEach((element, index) => {
-        element.textContent = translations[currentLang].weekdays[index];
-    });
-    
-    updateActiveLanguageButton();
-    updateCalendar(); // Mettre à jour le calendrier après la traduction
-}
-
-// Fonction pour obtenir la date locale au format YYYY-MM-DD
-function getLocalDateString() {
-    const now = new Date();
-    const timeZoneOffset = now.getTimezoneOffset();
-    const localDate = new Date(now.getTime() - (timeZoneOffset * 60000));
-    return localDate.toISOString().split('T')[0];
-}
-
-// Initialiser ou récupérer les données sauvegardées
-let startDate = '2025-01-01'; // Date de début corrigée pour 2025
+const START_DATE = '2025-01-01';
+let completedDays = {};
 let nombre = 1;
-let dernierJour = localStorage.getItem('dernierJour') || getLocalDateString();
-let completedDays = JSON.parse(localStorage.getItem('completedDays')) || {};
+let dernierJour = '';
 
-// Calculer le nombre de jours depuis le début
-function calculateDayNumber() {
-    const now = new Date();
-    const timeZoneOffset = now.getTimezoneOffset();
-    const localNow = new Date(now.getTime() - (timeZoneOffset * 60000));
-    
-    // On utilise directement le jour du mois
-    const day = localNow.getDate();
-    console.log('Jour du mois:', day);
-    
-    return day;
-}
-
-// Calculer le nombre de jours pour une date spécifique
+// Fonction pour calculer le nombre de jours pour une date spécifique
 function calculateDayNumberForDate(date) {
     const targetDate = new Date(date);
-    return targetDate.getDate();
+    const start = new Date(START_DATE);
+    const diffTime = Math.abs(targetDate - start);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
-// Initialisation au chargement de la page
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM chargé, initialisation...');
-    
+// Initialisation des données
+function initializeData() {
+    try {
+        completedDays = JSON.parse(localStorage.getItem('completedDays')) || {};
+        dernierJour = localStorage.getItem('dernierJour') || getLocalDateString();
+        nombre = parseInt(localStorage.getItem('nombre')) || calculateDayNumber();
+        
+        // Vérifier si nous sommes un nouveau jour
+        const aujourdhui = getLocalDateString();
+        if (dernierJour !== aujourdhui) {
+            nombre = calculateDayNumber();
+            dernierJour = aujourdhui;
+            const completedCheckbox = document.getElementById('completed');
+            if (completedCheckbox) {
+                completedCheckbox.checked = false;
+            }
+        } else {
+            const completedCheckbox = document.getElementById('completed');
+            if (completedCheckbox) {
+                completedCheckbox.checked = localStorage.getItem('completedToday') === 'true';
+            }
+        }
+        
+        updateDisplay();
+    } catch (error) {
+        console.error('Erreur lors de l\'initialisation:', error);
+        resetData();
+    }
+}
+
+// Fonction pour sauvegarder l'état
+function saveState() {
+    try {
+        const completedCheckbox = document.getElementById('completed');
+        const data = {
+            completedDays,
+            dernierJour,
+            nombre,
+            completedToday: completedCheckbox ? completedCheckbox.checked : false,
+            lastUpdate: getLocalDateString()
+        };
+        
+        Object.entries(data).forEach(([key, value]) => {
+            localStorage.setItem(key, typeof value === 'object' ? JSON.stringify(value) : value);
+        });
+        
+        return true;
+    } catch (error) {
+        console.error('Erreur lors de la sauvegarde:', error);
+        return false;
+    }
+}
+
+// Fonction pour réinitialiser les données
+function resetData() {
+    completedDays = {};
+    nombre = calculateDayNumber();
+    dernierJour = getLocalDateString();
+    const completedCheckbox = document.getElementById('completed');
+    if (completedCheckbox) {
+        completedCheckbox.checked = false;
+    }
+    saveState();
+    updateDisplay();
+}
+
+// Fonction pour obtenir la date locale
+function getLocalDateString() {
+    return new Date().toISOString().split('T')[0];
+}
+
+// Fonction pour calculer le nombre de jours
+function calculateDayNumber() {
+    const today = new Date();
+    const start = new Date(START_DATE);
+    const diffTime = Math.abs(today - start);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+// Mettre à jour l'affichage
+function updateDisplay() {
     const nombreElement = document.getElementById('nombre');
     const jourElement = document.getElementById('jour');
-    const completedCheckbox = document.getElementById('completed');
-    const shareBtn = document.getElementById('shareBtn');
-    const shareOptions = document.getElementById('shareOptions');
-
-    console.log('Éléments de partage:', {
-        shareBtn: shareBtn ? 'trouvé' : 'non trouvé',
-        shareOptions: shareOptions ? 'trouvé' : 'non trouvé'
-    });
-
-    // Initialiser l'affichage
-    nombre = calculateDayNumber();
-    nombreElement.textContent = nombre;
-    jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
     
-    // Initialiser la case à cocher
-    completedCheckbox.checked = localStorage.getItem('completedToday') === 'true';
+    if (nombreElement) {
+        nombreElement.textContent = nombre;
+    }
+    if (jourElement) {
+        jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
+    }
     
-    // Mettre à jour le total des push-ups
     updateTotalDisplay();
-    
-    // Mettre à jour le calendrier
     updateCalendar();
-    
-    // Initialiser les traductions
-    translateUI();
-    
-    // Initialiser les boutons de langue
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            currentLang = btn.dataset.lang;
-            localStorage.setItem('language', currentLang);
-            translateUI();
-        });
-    });
-    
-    // Gestion de la case à cocher
-    completedCheckbox.addEventListener('change', () => {
-        const today = getLocalDateString();
-        const todayNumber = calculateDayNumber(); // Utiliser le vrai numéro du jour
-        console.log('Jour actuel:', todayNumber);
-        console.log('CompletedDays avant:', completedDays);
-        
-        if (completedCheckbox.checked) {
-            completedDays[today] = todayNumber;
-            console.log('Ajout de', todayNumber, 'push-ups pour', today);
-        } else {
-            delete completedDays[today];
-            console.log('Suppression des push-ups pour', today);
-        }
-        
-        console.log('CompletedDays après:', completedDays);
-        localStorage.setItem('completedDays', JSON.stringify(completedDays));
-        localStorage.setItem('completedToday', completedCheckbox.checked);
-        updateTotalDisplay();
-        updateCalendar();
-    });
-
-    // Gestion du partage
-    if (shareBtn && shareOptions) {
-        console.log('Ajout des gestionnaires d\'événements pour le partage');
-        
-        shareBtn.addEventListener('click', (e) => {
-            console.log('Clic sur le bouton de partage');
-            e.stopPropagation();
-            shareOptions.classList.toggle('visible');
-            console.log('Menu de partage visible:', shareOptions.classList.contains('visible'));
-        });
-
-        // Fermer le menu de partage en cliquant ailleurs
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.share-container')) {
-                console.log('Clic en dehors du menu de partage');
-                shareOptions.classList.remove('visible');
-            }
-        });
-
-        // Gestionnaire de partage
-        const copyButton = document.querySelector('[data-platform="copy"]');
-        console.log('Bouton de copie:', copyButton ? 'trouvé' : 'non trouvé');
-        
-        if (copyButton) {
-            copyButton.addEventListener('click', async () => {
-                console.log('Clic sur le bouton de copie');
-                const message = createShareMessage();
-                console.log('Message à copier:', message);
-                
-                try {
-                    const success = await copyToClipboard(message);
-                    console.log('Résultat de la copie:', success ? 'succès' : 'échec');
-                    
-                    // Créer et afficher la notification
-                    const notification = document.createElement('div');
-                    notification.className = 'copy-notification';
-                    notification.textContent = success 
-                        ? (currentLang === 'fr' ? '✅ Texte copié !' : '✅ Text copied!')
-                        : (currentLang === 'fr' ? '❌ Erreur lors de la copie' : '❌ Copy failed');
-                    
-                    document.body.appendChild(notification);
-                    console.log('Notification ajoutée');
-                    
-                    // Animation et suppression de la notification
-                    setTimeout(() => {
-                        notification.classList.add('fade-out');
-                        setTimeout(() => {
-                            document.body.removeChild(notification);
-                            console.log('Notification supprimée');
-                        }, 500);
-                    }, 2000);
-                    
-                    // Fermer le menu de partage
-                    shareOptions.classList.remove('visible');
-                } catch (err) {
-                    console.error('Erreur lors du partage:', err);
-                }
-            });
-        } else {
-            console.error('Bouton de copie non trouvé dans le DOM');
-        }
-    } else {
-        console.error('Éléments de partage non trouvés dans le DOM');
-    }
-
-    // Variables pour l'installation PWA
-    let deferredPrompt;
-    const installButton = document.getElementById('installButton');
-    const iosInstall = document.getElementById('iosInstall');
-    const androidInstall = document.getElementById('androidInstall');
-
-    // Écouter l'événement beforeinstallprompt
-    window.addEventListener('beforeinstallprompt', (e) => {
-        // Empêcher Chrome 67 et versions antérieures d'afficher automatiquement l'invite
-        e.preventDefault();
-        // Stocker l'événement pour pouvoir le déclencher plus tard
-        deferredPrompt = e;
-        // Mettre à jour l'interface utilisateur pour afficher le bouton d'installation
-        installButton.style.display = 'flex';
-    });
-
-    // Gestionnaire de clic pour le bouton d'installation
-    installButton.addEventListener('click', async () => {
-        if (!deferredPrompt) {
-            return;
-        }
-        // Afficher l'invite d'installation
-        deferredPrompt.prompt();
-        // Attendre que l'utilisateur réponde à l'invite
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to the install prompt: ${outcome}`);
-        // On n'a plus besoin de l'invite, on la supprime
-        deferredPrompt = null;
-        // Cacher le bouton d'installation
-        installButton.style.display = 'none';
-    });
-
-    // Écouter l'événement appinstalled
-    window.addEventListener('appinstalled', (evt) => {
-        console.log('Application installée avec succès');
-        // Cacher le bouton d'installation et les instructions iOS
-        installButton.style.display = 'none';
-        iosInstall.style.display = 'none';
-        androidInstall.style.display = 'none';
-    });
-
-    // Détecter le système d'exploitation et afficher les instructions appropriées
-    function detectDevice() {
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        const isAndroid = /Android/.test(navigator.userAgent);
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                            window.navigator.standalone;
-        
-        const iosInstall = document.getElementById('iosInstall');
-        const androidInstall = document.getElementById('androidInstall');
-        const installButton = document.getElementById('installButton');
-        
-        if (!isStandalone) {
-            if (isIOS) {
-                iosInstall.style.display = 'block';
-                androidInstall.style.display = 'none';
-                installButton.style.display = 'none';
-                // Animation pour iOS
-                setTimeout(() => {
-                    iosInstall.classList.add('pulse');
-                    setTimeout(() => iosInstall.classList.remove('pulse'), 1000);
-                }, 2000);
-            } else if (isAndroid) {
-                androidInstall.style.display = 'block';
-                iosInstall.style.display = 'none';
-                // Le bouton d'installation natif sera géré par Chrome
-                // Animation pour Android
-                setTimeout(() => {
-                    androidInstall.classList.add('pulse');
-                    setTimeout(() => androidInstall.classList.remove('pulse'), 1000);
-                }, 2000);
-            }
-        } else {
-            // L'application est déjà installée
-            iosInstall.style.display = 'none';
-            androidInstall.style.display = 'none';
-            installButton.style.display = 'none';
-        }
-    }
-
-    // Détecter le système et afficher les instructions appropriées
-    detectDevice();
-    
-    // Vérifier si un jour est passé
-    verifierJour();
-
-    // Vérifier si l'application est en mode standalone (installée)
-    function isAppInstalled() {
-        return window.matchMedia('(display-mode: standalone)').matches || 
-               window.navigator.standalone || 
-               document.referrer.includes('android-app://');
-    }
-
-    // Détecter le mode d'affichage
-    function checkDisplayMode() {
-        if (isAppInstalled()) {
-            document.body.classList.add('standalone-mode');
-            // Masquer les éléments d'installation
-            if (installButton) installButton.style.display = 'none';
-            if (iosInstall) iosInstall.style.display = 'none';
-            if (androidInstall) androidInstall.style.display = 'none';
-        }
-    }
-
-    // Vérifier la connexion internet
-    function checkOnlineStatus() {
-        const updateOnlineStatus = () => {
-            const status = navigator.onLine;
-            document.body.classList.toggle('offline', !status);
-            
-            // Afficher une notification de statut
-            const notification = document.createElement('div');
-            notification.className = `status-notification ${status ? 'online' : 'offline'}`;
-            notification.textContent = status 
-                ? (currentLang === 'fr' ? '✅ Connexion rétablie' : '✅ Back online')
-                : (currentLang === 'fr' ? '⚠️ Mode hors ligne' : '⚠️ Offline mode');
-            
-            document.body.appendChild(notification);
-            setTimeout(() => {
-                notification.classList.add('fade-out');
-                setTimeout(() => document.body.removeChild(notification), 500);
-            }, 2000);
-        };
-
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-        updateOnlineStatus(); // Vérifier le statut initial
-    }
-
-    // Amélioration de la détection iOS
-    function detectiOS() {
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                            window.navigator.standalone;
-        
-        if (isIOS && !isStandalone) {
-            iosInstall.style.display = 'block';
-            // Ajouter une animation subtile pour attirer l'attention
-            setTimeout(() => {
-                iosInstall.classList.add('pulse');
-                setTimeout(() => iosInstall.classList.remove('pulse'), 1000);
-            }, 2000);
-        }
-    }
-
-    // Initialisation améliorée
-    checkDisplayMode();
-    checkOnlineStatus();
-    
-    // Détecter iOS et afficher les instructions appropriées
-    detectiOS();
-    
-    // Écouter les changements de mode d'affichage
-    window.matchMedia('(display-mode: standalone)').addEventListener('change', (evt) => {
-        checkDisplayMode();
-    });
-    
-    // Ajouter une notification de mise à jour disponible
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            const notification = document.createElement('div');
-            notification.className = 'update-notification';
-            notification.innerHTML = `
-                <span>${currentLang === 'fr' ? 'Mise à jour disponible' : 'Update available'}</span>
-                <button onclick="window.location.reload()">
-                    ${currentLang === 'fr' ? 'Actualiser' : 'Refresh'}
-                </button>
-            `;
-            document.body.appendChild(notification);
-        });
-    }
-});
-
-// Fonction pour créer le message de partage
-function createShareMessage() {
-    const total = calculateTotalPushups();
-    const completedDaysCount = Object.keys(completedDays).length;
-    return currentLang === 'fr' 
-        ? `🏋️‍♂️ Défi Push-ups : Jour ${nombre}\n` +
-          `💪 Total : ${total} push-ups\n` +
-          `✅ ${completedDaysCount} jours complétés\n` +
-          `🎯 Objectif : 365 jours\n` +
-          `#DéfiPushups #Fitness`
-        : `🏋️‍♂️ Push-ups Challenge: Day ${nombre}\n` +
-          `💪 Total: ${total} push-ups\n` +
-          `✅ ${completedDaysCount} days completed\n` +
-          `🎯 Goal: 365 days\n` +
-          `#PushupChallenge #Fitness`;
 }
 
-// Fonction pour copier du texte
-async function copyToClipboard(text) {
+// Gérer le partage
+function handleShare() {
+    const total = calculateTotalPushups();
+    const today = new Date().toLocaleDateString();
+    const shareText = `🏋️‍♂️ Challenge Push-ups\n${today}\nJour ${nombre}: ${nombre} pompes\nTotal: ${total} pompes\n💪 #PushupChallenge`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'Challenge Push-ups',
+            text: shareText,
+            url: window.location.href
+        }).catch(console.error);
+    } else {
+        copyToClipboard(shareText);
+    }
+}
+
+// Copier dans le presse-papier
+function copyToClipboard(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
     try {
-        await navigator.clipboard.writeText(text);
-        return true;
+        document.execCommand('copy');
+        showToast('Copié dans le presse-papier !');
     } catch (err) {
         console.error('Erreur lors de la copie:', err);
-        
-        // Fallback pour les navigateurs qui ne supportent pas l'API Clipboard
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        
-        try {
-            document.execCommand('copy');
-            return true;
-        } catch (err) {
-            console.error('Fallback copy failed:', err);
-            return false;
-        } finally {
-            document.body.removeChild(textArea);
-        }
+        showToast('Erreur lors de la copie');
+    }
+    document.body.removeChild(textarea);
+}
+
+// Afficher un toast
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// Calculer le total des pompes
+function calculateTotalPushups() {
+    return Object.entries(completedDays)
+        .filter(([_, completed]) => completed)
+        .reduce((total, [date]) => total + calculateDayNumberForDate(date), 0);
+}
+
+// Mettre à jour l'affichage du total
+function updateTotalDisplay() {
+    const total = calculateTotalPushups();
+    const totalElement = document.getElementById('totalPushups');
+    if (totalElement) {
+        totalElement.textContent = total;
     }
 }
+
+// Gestionnaire d'événements
+document.addEventListener('DOMContentLoaded', () => {
+    initializeData();
+    
+    // Gérer la case à cocher
+    const completedCheckbox = document.getElementById('completed');
+    if (completedCheckbox) {
+        completedCheckbox.addEventListener('change', (e) => {
+            const date = getLocalDateString();
+            completedDays[date] = e.target.checked;
+            saveState();
+            updateDisplay();
+        });
+    }
+    
+    // Gérer le partage
+    const shareButton = document.getElementById('shareButton');
+    const copyButton = document.getElementById('copyButton');
+    
+    if (shareButton) {
+        shareButton.addEventListener('click', handleShare);
+    }
+    
+    if (copyButton) {
+        copyButton.addEventListener('click', () => {
+            const total = calculateTotalPushups();
+            const shareText = `🏋️‍♂️ Challenge Push-ups\nJour ${nombre}: ${nombre} pompes\nTotal: ${total} pompes\n💪 #PushupChallenge`;
+            copyToClipboard(shareText);
+        });
+    }
+    
+    // Gérer les onglets
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            button.classList.add('active');
+            const tabContent = document.getElementById(`${button.dataset.tab}-tab`);
+            if (tabContent) {
+                tabContent.classList.add('active');
+            }
+        });
+    });
+});
+
+// Sauvegarder avant de fermer
+window.addEventListener('beforeunload', saveState);
+
+// Sauvegarder périodiquement
+setInterval(saveState, 30000);
+
+// Gérer la visibilité
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+        saveState();
+    } else {
+        initializeData();
+    }
+});
 
 // Calendrier
 let currentDate = new Date();
@@ -525,13 +347,15 @@ function updateCalendar() {
                     dayElement.classList.add('completed');
                 }
                 
-                localStorage.setItem('completedDays', JSON.stringify(completedDays));
+                saveState();
                 updateTotalDisplay();
                 
                 // Mettre à jour la case à cocher si c'est aujourd'hui
                 if (dateString === today) {
-                    completedCheckbox.checked = !completedCheckbox.checked;
-                    localStorage.setItem('completedToday', completedCheckbox.checked);
+                    const completedCheckbox = document.getElementById('completed');
+                    if (completedCheckbox) {
+                        completedCheckbox.checked = !completedCheckbox.checked;
+                    }
                 }
             });
         }
@@ -550,7 +374,7 @@ document.getElementById('prevMonth').addEventListener('click', () => {
     newDate.setMonth(newDate.getMonth() - 1);
     
     // Vérifier si la nouvelle date est après la date de début
-    const start = new Date(startDate);
+    const start = new Date(START_DATE);
     if (newDate.getTime() >= start.getTime()) {
         currentDate = newDate;
         updateCalendar();
@@ -569,31 +393,76 @@ document.getElementById('nextMonth').addEventListener('click', () => {
     }
 });
 
-// Fonction pour calculer le total des push-ups
-function calculateTotalPushups() {
-    console.log('Calcul du total, completedDays:', completedDays);
-    let total = 0;
-    const values = Object.values(completedDays);
-    console.log('Valeurs à additionner:', values);
+// Vérifier si un jour est passé depuis la dernière visite
+function verifierJour() {
+    const aujourdhui = getLocalDateString();
+    const maintenant = new Date();
+    const dernierJourDate = new Date(dernierJour);
     
-    for (let i = 0; i < values.length; i++) {
-        const pushups = parseInt(values[i]);
-        console.log('Conversion de', values[i], 'en', pushups);
-        if (!isNaN(pushups)) {
-            total += pushups;
-            console.log('Nouveau total:', total);
+    // Vérifier si nous avons changé de mois
+    const moisChange = maintenant.getMonth() !== dernierJourDate.getMonth() || 
+                      maintenant.getFullYear() !== dernierJourDate.getFullYear();
+    
+    if (aujourdhui !== dernierJour) {
+        console.log('Changement de jour détecté');
+        console.log('Ancien jour:', dernierJour);
+        console.log('Nouveau jour:', aujourdhui);
+        console.log('Fuseau horaire:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+        console.log('Changement de mois:', moisChange);
+        
+        // Réinitialiser la case à cocher pour le nouveau jour
+        const completedCheckbox = document.getElementById('completed');
+        if (completedCheckbox) {
+            completedCheckbox.checked = false;
+        }
+        
+        // Mettre à jour le dernier jour
+        dernierJour = aujourdhui;
+        nombre = calculateDayNumber();
+        
+        // Sauvegarder les nouvelles valeurs
+        saveState();
+        
+        // Si nous avons changé de mois, mettre à jour la date courante du calendrier
+        if (moisChange) {
+            currentDate = new Date();
         }
     }
     
-    console.log('Total final des push-ups:', total);
-    return total;
+    // Mettre à jour l'affichage
+    const nombreElement = document.getElementById('nombre');
+    const jourElement = document.getElementById('jour');
+    if (nombreElement) {
+        nombreElement.textContent = nombre;
+    }
+    if (jourElement) {
+        jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
+    }
+    updateCalendar();
 }
 
-// Fonction pour mettre à jour l'affichage du total
-function updateTotalDisplay() {
-    const totalPushups = document.getElementById('totalPushups');
-    totalPushups.textContent = calculateTotalPushups();
-}
+// Vérifier toutes les heures si un jour est passé
+setInterval(verifierJour, 3600000); // 3600000 ms = 1 heure
+
+// Force le rafraîchissement des données au chargement
+window.addEventListener('load', () => {
+    // Effacer le cache local si nécessaire
+    if (localStorage.getItem('lastUpdate') !== getLocalDateString()) {
+        localStorage.setItem('lastUpdate', getLocalDateString());
+        nombre = calculateDayNumber();
+        
+        // Mettre à jour l'affichage
+        const nombreElement = document.getElementById('nombre');
+        const jourElement = document.getElementById('jour');
+        if (nombreElement) {
+            nombreElement.textContent = nombre;
+        }
+        if (jourElement) {
+            jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
+        }
+        updateCalendar();
+    }
+});
 
 // Détecter le système d'exploitation et afficher les instructions appropriées
 function detectDevice() {
@@ -637,65 +506,210 @@ function detectDevice() {
 // Appeler la détection au chargement
 window.addEventListener('load', detectDevice);
 
-// Vérifier si un jour est passé depuis la dernière visite
-function verifierJour() {
-    const aujourdhui = getLocalDateString();
-    const maintenant = new Date();
-    const dernierJourDate = new Date(dernierJour);
-    
-    // Vérifier si nous avons changé de mois
-    const moisChange = maintenant.getMonth() !== dernierJourDate.getMonth() || 
-                      maintenant.getFullYear() !== dernierJourDate.getFullYear();
-    
-    if (aujourdhui !== dernierJour) {
-        console.log('Changement de jour détecté');
-        console.log('Ancien jour:', dernierJour);
-        console.log('Nouveau jour:', aujourdhui);
-        console.log('Fuseau horaire:', Intl.DateTimeFormat().resolvedOptions().timeZone);
-        console.log('Changement de mois:', moisChange);
-        
-        // Réinitialiser la case à cocher pour le nouveau jour
-        completedCheckbox.checked = false;
-        localStorage.setItem('completedToday', 'false');
-        
-        // Mettre à jour le dernier jour
-        dernierJour = aujourdhui;
-        nombre = calculateDayNumber();
-        
-        // Sauvegarder les nouvelles valeurs
-        localStorage.setItem('dernierJour', dernierJour);
-        localStorage.setItem('nombre', nombre);
-        
-        // Si nous avons changé de mois, mettre à jour la date courante du calendrier
-        if (moisChange) {
-            currentDate = new Date();
-        }
+// Variables pour l'installation PWA
+let deferredPrompt;
+const installButton = document.getElementById('installButton');
+const iosInstall = document.getElementById('iosInstall');
+const androidInstall = document.getElementById('androidInstall');
+
+// Écouter l'événement beforeinstallprompt
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Empêcher Chrome 67 et versions antérieures d'afficher automatiquement l'invite
+    e.preventDefault();
+    // Stocker l'événement pour pouvoir le déclencher plus tard
+    deferredPrompt = e;
+    // Mettre à jour l'interface utilisateur pour afficher le bouton d'installation
+    installButton.style.display = 'flex';
+});
+
+// Gestionnaire de clic pour le bouton d'installation
+installButton.addEventListener('click', async () => {
+    if (!deferredPrompt) {
+        return;
     }
+    // Afficher l'invite d'installation
+    deferredPrompt.prompt();
+    // Attendre que l'utilisateur réponde à l'invite
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
+    // On n'a plus besoin de l'invite, on la supprime
+    deferredPrompt = null;
+    // Cacher le bouton d'installation
+    installButton.style.display = 'none';
+});
+
+// Écouter l'événement appinstalled
+window.addEventListener('appinstalled', (evt) => {
+    console.log('Application installée avec succès');
+    // Cacher le bouton d'installation et les instructions iOS
+    installButton.style.display = 'none';
+    iosInstall.style.display = 'none';
+    androidInstall.style.display = 'none';
+});
+
+// Détecter le système et afficher les instructions appropriées
+function detectDevice() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isAndroid = /Android/.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                        window.navigator.standalone;
     
-    // Mettre à jour l'affichage
-    const nombreElement = document.getElementById('nombre');
-    const jourElement = document.getElementById('jour');
-    nombreElement.textContent = nombre;
-    jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
-    updateCalendar();
+    const iosInstall = document.getElementById('iosInstall');
+    const androidInstall = document.getElementById('androidInstall');
+    const installButton = document.getElementById('installButton');
+    
+    if (!isStandalone) {
+        if (isIOS) {
+            iosInstall.style.display = 'block';
+            androidInstall.style.display = 'none';
+            installButton.style.display = 'none';
+            // Animation pour iOS
+            setTimeout(() => {
+                iosInstall.classList.add('pulse');
+                setTimeout(() => iosInstall.classList.remove('pulse'), 1000);
+            }, 2000);
+        } else if (isAndroid) {
+            androidInstall.style.display = 'block';
+            iosInstall.style.display = 'none';
+            // Le bouton d'installation natif sera géré par Chrome
+            // Animation pour Android
+            setTimeout(() => {
+                androidInstall.classList.add('pulse');
+                setTimeout(() => androidInstall.classList.remove('pulse'), 1000);
+            }, 2000);
+        }
+    } else {
+        // L'application est déjà installée
+        iosInstall.style.display = 'none';
+        androidInstall.style.display = 'none';
+        installButton.style.display = 'none';
+    }
 }
 
-// Vérifier toutes les heures si un jour est passé
-setInterval(verifierJour, 3600000); // 3600000 ms = 1 heure
-
-// Force le rafraîchissement des données au chargement
-window.addEventListener('load', () => {
-    // Effacer le cache local si nécessaire
-    if (localStorage.getItem('lastUpdate') !== getLocalDateString()) {
-        localStorage.setItem('lastUpdate', getLocalDateString());
-        nombre = calculateDayNumber();
-        localStorage.setItem('nombre', nombre);
-        
-        // Mettre à jour l'affichage
-        const nombreElement = document.getElementById('nombre');
-        const jourElement = document.getElementById('jour');
-        nombreElement.textContent = nombre;
-        jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
-        updateCalendar();
+// Détecter le système et afficher les instructions appropriées
+function detectDevice() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isAndroid = /Android/.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                        window.navigator.standalone;
+    
+    const iosInstall = document.getElementById('iosInstall');
+    const androidInstall = document.getElementById('androidInstall');
+    const installButton = document.getElementById('installButton');
+    
+    if (!isStandalone) {
+        if (isIOS) {
+            iosInstall.style.display = 'block';
+            androidInstall.style.display = 'none';
+            installButton.style.display = 'none';
+            // Animation pour iOS
+            setTimeout(() => {
+                iosInstall.classList.add('pulse');
+                setTimeout(() => iosInstall.classList.remove('pulse'), 1000);
+            }, 2000);
+        } else if (isAndroid) {
+            androidInstall.style.display = 'block';
+            iosInstall.style.display = 'none';
+            // Le bouton d'installation natif sera géré par Chrome
+            // Animation pour Android
+            setTimeout(() => {
+                androidInstall.classList.add('pulse');
+                setTimeout(() => androidInstall.classList.remove('pulse'), 1000);
+            }, 2000);
+        }
+    } else {
+        // L'application est déjà installée
+        iosInstall.style.display = 'none';
+        androidInstall.style.display = 'none';
+        installButton.style.display = 'none';
     }
+}
+
+// Appeler la détection au chargement
+window.addEventListener('load', detectDevice);
+
+// Vérifier si l'application est en mode standalone (installée)
+function isAppInstalled() {
+    return window.matchMedia('(display-mode: standalone)').matches || 
+           window.navigator.standalone || 
+           document.referrer.includes('android-app://');
+}
+
+// Détecter le mode d'affichage
+function checkDisplayMode() {
+    if (isAppInstalled()) {
+        document.body.classList.add('standalone-mode');
+        // Masquer les éléments d'installation
+        if (installButton) installButton.style.display = 'none';
+        if (iosInstall) iosInstall.style.display = 'none';
+        if (androidInstall) androidInstall.style.display = 'none';
+    }
+}
+
+// Vérifier la connexion internet
+function checkOnlineStatus() {
+    const updateOnlineStatus = () => {
+        const status = navigator.onLine;
+        document.body.classList.toggle('offline', !status);
+        
+        // Afficher une notification de statut
+        const notification = document.createElement('div');
+        notification.className = `status-notification ${status ? 'online' : 'offline'}`;
+        notification.textContent = status 
+            ? (currentLang === 'fr' ? '✅ Connexion rétablie' : '✅ Back online')
+            : (currentLang === 'fr' ? '⚠️ Mode hors ligne' : '⚠️ Offline mode');
+        
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.classList.add('fade-out');
+            setTimeout(() => document.body.removeChild(notification), 500);
+        }, 2000);
+    };
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus(); // Vérifier le statut initial
+}
+
+// Amélioration de la détection iOS
+function detectiOS() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                        window.navigator.standalone;
+    
+    if (isIOS && !isStandalone) {
+        iosInstall.style.display = 'block';
+        // Ajouter une animation subtile pour attirer l'attention
+        setTimeout(() => {
+            iosInstall.classList.add('pulse');
+            setTimeout(() => iosInstall.classList.remove('pulse'), 1000);
+        }, 2000);
+    }
+}
+
+// Initialisation améliorée
+checkDisplayMode();
+checkOnlineStatus();
+    
+// Détecter iOS et afficher les instructions appropriées
+detectiOS();
+    
+// Écouter les changements de mode d'affichage
+window.matchMedia('(display-mode: standalone)').addEventListener('change', (evt) => {
+    checkDisplayMode();
 });
+    
+// Ajouter une notification de mise à jour disponible
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        const notification = document.createElement('div');
+        notification.className = 'update-notification';
+        notification.innerHTML = `
+            <span>${currentLang === 'fr' ? 'Mise à jour disponible' : 'Update available'}</span>
+            <button onclick="window.location.reload()">
+                ${currentLang === 'fr' ? 'Actualiser' : 'Refresh'}
+            </button>
+        `;
+        document.body.appendChild(notification);
+    });
+}
