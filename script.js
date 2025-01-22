@@ -195,6 +195,21 @@ verifierJour();
 // Vérifier toutes les heures si un jour est passé
 setInterval(verifierJour, 3600000); // 3600000 ms = 1 heure
 
+// Force le rafraîchissement des données au chargement
+window.addEventListener('load', () => {
+    // Effacer le cache local si nécessaire
+    if (localStorage.getItem('lastUpdate') !== getLocalDateString()) {
+        localStorage.setItem('lastUpdate', getLocalDateString());
+        nombre = calculateDayNumber();
+        localStorage.setItem('nombre', nombre);
+        
+        // Mettre à jour l'affichage
+        nombreElement.textContent = nombre;
+        jourElement.textContent = `Jour ${nombre}`;
+        updateCalendar();
+    }
+});
+
 // Gestion du partage
 const shareBtn = document.getElementById('shareBtn');
 const shareOptions = document.getElementById('shareOptions');

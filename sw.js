@@ -1,77 +1,73 @@
-const CACHE_NAME = 'compteur-v2';
-const ASSETS = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/script.js',
-    '/manifest.json',
-    '/icon-192.png'
+const CACHE_NAME = 'pushups-app-v2';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/style.css',
+  '/script.js',
+  '/icon-192.png',
+  'https://kit.fontawesome.com/your-kit-code.js'
 ];
 
-// Installation du Service Worker
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                console.log('Mise en cache des ressources');
-                return cache.addAll(ASSETS);
-            })
-    );
-    // Force le Service Worker à devenir actif immédiatement
-    self.skipWaiting();
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+      .then(() => self.skipWaiting()) // Force l'activation immédiate
+  );
 });
 
-// Activation du Service Worker
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('Suppression de l\'ancien cache:', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName); // Supprime l'ancien cache
+          }
         })
-    );
-    // Prend le contrôle immédiatement
-    self.clients.claim();
+      );
+    }).then(() => self.clients.claim()) // Prend le contrôle immédiatement
+  );
 });
 
-// Interception des requêtes
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request)
-            .then((response) => {
-                // Retourne la réponse du cache si elle existe
-                if (response) {
-                    return response;
-                }
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // Vérifie si la requête est pour script.js
+        if (event.request.url.endsWith('script.js')) {
+          // Pour script.js, toujours aller chercher la dernière version
+          return fetch(event.request).then(response => {
+            // Clone la réponse car elle ne peut être utilisée qu'une fois
+            const responseToCache = response.clone();
+            
+            caches.open(CACHE_NAME)
+              .then(cache => {
+                cache.put(event.request, responseToCache);
+              });
 
-                // Sinon, fait la requête au réseau
-                return fetch(event.request)
-                    .then((response) => {
-                        // Vérifie si la réponse est valide
-                        if (!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
+            return response;
+          }).catch(() => response);
+        }
+        
+        // Pour les autres fichiers, utiliser le cache d'abord
+        if (response) {
+          return response;
+        }
+        return fetch(event.request).then(response => {
+          // Ne pas mettre en cache les requêtes qui ont échoué
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response;
+          }
 
-                        // Clone la réponse car elle ne peut être utilisée qu'une fois
-                        const responseToCache = response.clone();
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, responseToCache);
+            });
 
-                        // Ajoute la nouvelle ressource au cache
-                        caches.open(CACHE_NAME)
-                            .then((cache) => {
-                                cache.put(event.request, responseToCache);
-                            });
-
-                        return response;
-                    });
-            })
-            .catch(() => {
-                // Si la requête échoue (pas de connexion), retourne une page d'erreur du cache
-                return caches.match('/index.html');
-            })
-    );
+          return response;
+        });
+      })
+  );
 });
