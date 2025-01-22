@@ -115,31 +115,37 @@ function calculateDayNumberForDate(date) {
 
 // Initialisation au chargement de la page
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM chargé, initialisation...');
+    
     const nombreElement = document.getElementById('nombre');
     const jourElement = document.getElementById('jour');
     const completedCheckbox = document.getElementById('completed');
-    const totalPushups = document.getElementById('totalPushups');
-    
-    // Initialiser le jour actuel
+    const shareBtn = document.getElementById('shareBtn');
+    const shareOptions = document.getElementById('shareOptions');
+
+    console.log('Éléments de partage:', {
+        shareBtn: shareBtn ? 'trouvé' : 'non trouvé',
+        shareOptions: shareOptions ? 'trouvé' : 'non trouvé'
+    });
+
+    // Initialiser l'affichage
     nombre = calculateDayNumber();
-    localStorage.setItem('nombre', nombre);
-    
-    // Sauvegarder la date de début si elle n'existe pas
-    if (!localStorage.getItem('startDate')) {
-        localStorage.setItem('startDate', startDate);
-    }
-    
-    // Charger l'état de la case à cocher depuis le localStorage
-    const isCompletedToday = localStorage.getItem('completedToday') === 'true';
-    completedCheckbox.checked = isCompletedToday;
-    
-    // Afficher le nombre initial et le jour
     nombreElement.textContent = nombre;
+    jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
     
-    // Mettre à jour l'affichage initial du total
-    totalPushups.textContent = calculateTotalPushups();
+    // Initialiser la case à cocher
+    completedCheckbox.checked = localStorage.getItem('completedToday') === 'true';
     
-    // Gestionnaire de changement de langue
+    // Mettre à jour le total
+    updateTotalDisplay();
+    
+    // Mettre à jour le calendrier
+    updateCalendar();
+    
+    // Initialiser les traductions
+    translateUI();
+    
+    // Initialiser les boutons de langue
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             currentLang = btn.dataset.lang;
@@ -148,40 +154,130 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    // Initialiser la traduction
-    translateUI();
-    
-    // Détecter iOS
-    detectiOS();
-    
-    // Gestionnaire de la case à cocher
-    completedCheckbox.addEventListener('change', (e) => {
+    // Gestion de la case à cocher
+    completedCheckbox.addEventListener('change', () => {
         const today = getLocalDateString();
-        localStorage.setItem('completedToday', e.target.checked);
-        
-        if (e.target.checked) {
+        if (completedCheckbox.checked) {
             completedDays[today] = nombre;
         } else {
             delete completedDays[today];
         }
-        
         localStorage.setItem('completedDays', JSON.stringify(completedDays));
-        totalPushups.textContent = calculateTotalPushups();
+        localStorage.setItem('completedToday', completedCheckbox.checked);
+        updateTotalDisplay();
         updateCalendar();
     });
-    
-    // Vérifier le changement de jour
+
+    // Gestion du partage
+    if (shareBtn && shareOptions) {
+        console.log('Ajout des gestionnaires d\'événements pour le partage');
+        
+        shareBtn.addEventListener('click', (e) => {
+            console.log('Clic sur le bouton de partage');
+            e.stopPropagation();
+            shareOptions.classList.toggle('visible');
+            console.log('Menu de partage visible:', shareOptions.classList.contains('visible'));
+        });
+
+        // Fermer le menu de partage en cliquant ailleurs
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.share-container')) {
+                console.log('Clic en dehors du menu de partage');
+                shareOptions.classList.remove('visible');
+            }
+        });
+
+        // Gestionnaire de partage
+        const copyButton = document.querySelector('[data-platform="copy"]');
+        console.log('Bouton de copie:', copyButton ? 'trouvé' : 'non trouvé');
+        
+        if (copyButton) {
+            copyButton.addEventListener('click', async () => {
+                console.log('Clic sur le bouton de copie');
+                const message = createShareMessage();
+                console.log('Message à copier:', message);
+                
+                try {
+                    const success = await copyToClipboard(message);
+                    console.log('Résultat de la copie:', success ? 'succès' : 'échec');
+                    
+                    // Créer et afficher la notification
+                    const notification = document.createElement('div');
+                    notification.className = 'copy-notification';
+                    notification.textContent = success 
+                        ? (currentLang === 'fr' ? '✅ Texte copié !' : '✅ Text copied!')
+                        : (currentLang === 'fr' ? '❌ Erreur lors de la copie' : '❌ Copy failed');
+                    
+                    document.body.appendChild(notification);
+                    console.log('Notification ajoutée');
+                    
+                    // Animation et suppression de la notification
+                    setTimeout(() => {
+                        notification.classList.add('fade-out');
+                        setTimeout(() => {
+                            document.body.removeChild(notification);
+                            console.log('Notification supprimée');
+                        }, 500);
+                    }, 2000);
+                    
+                    // Fermer le menu de partage
+                    shareOptions.classList.remove('visible');
+                } catch (err) {
+                    console.error('Erreur lors du partage:', err);
+                }
+            });
+        } else {
+            console.error('Bouton de copie non trouvé dans le DOM');
+        }
+    } else {
+        console.error('Éléments de partage non trouvés dans le DOM');
+    }
+
+    // Vérifier si un jour est passé
     verifierJour();
 });
 
-// Fonction pour calculer le total des push-ups
-function calculateTotalPushups() {
-    return Object.values(completedDays).reduce((total, pushups) => total + pushups, 0);
+// Fonction pour créer le message de partage
+function createShareMessage() {
+    const total = calculateTotalPushups();
+    const completedDaysCount = Object.keys(completedDays).length;
+    return currentLang === 'fr' 
+        ? `🏋️‍♂️ Défi Push-ups : Jour ${nombre}\n` +
+          `💪 Total : ${total} push-ups\n` +
+          `✅ ${completedDaysCount} jours complétés\n` +
+          `🎯 Objectif : 365 jours\n` +
+          `#DéfiPushups #Fitness`
+        : `🏋️‍♂️ Push-ups Challenge: Day ${nombre}\n` +
+          `💪 Total: ${total} push-ups\n` +
+          `✅ ${completedDaysCount} days completed\n` +
+          `🎯 Goal: 365 days\n` +
+          `#PushupChallenge #Fitness`;
 }
 
-// Fonction pour mettre à jour l'affichage du total
-function updateTotalDisplay() {
-    totalPushups.textContent = calculateTotalPushups();
+// Fonction pour copier du texte
+async function copyToClipboard(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        return true;
+    } catch (err) {
+        console.error('Erreur lors de la copie:', err);
+        
+        // Fallback pour les navigateurs qui ne supportent pas l'API Clipboard
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            return true;
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
+            return false;
+        } finally {
+            document.body.removeChild(textArea);
+        }
+    }
 }
 
 // Calendrier
@@ -293,120 +389,16 @@ document.getElementById('nextMonth').addEventListener('click', () => {
     }
 });
 
-// Initialisation
-verifierJour();
-
-// Vérifier toutes les heures si un jour est passé
-setInterval(verifierJour, 3600000); // 3600000 ms = 1 heure
-
-// Force le rafraîchissement des données au chargement
-window.addEventListener('load', () => {
-    // Effacer le cache local si nécessaire
-    if (localStorage.getItem('lastUpdate') !== getLocalDateString()) {
-        localStorage.setItem('lastUpdate', getLocalDateString());
-        nombre = calculateDayNumber();
-        localStorage.setItem('nombre', nombre);
-        
-        // Mettre à jour l'affichage
-        nombreElement.textContent = nombre;
-        jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
-        updateCalendar();
-    }
-});
-
-// Gestion du partage
-const shareBtn = document.getElementById('shareBtn');
-const shareOptions = document.getElementById('shareOptions');
-
-shareBtn.addEventListener('click', () => {
-    shareOptions.classList.toggle('visible');
-});
-
-// Cacher les options de partage quand on clique ailleurs
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.share-container')) {
-        shareOptions.classList.remove('visible');
-    }
-});
-
-// Créer un élément pour la notification
-const notification = document.createElement('div');
-notification.className = 'copy-notification';
-notification.style.display = 'none';
-document.body.appendChild(notification);
-
-// Fonction pour créer le message de partage
-function createShareMessage() {
-    const total = calculateTotalPushups();
-    const completedDaysCount = Object.keys(completedDays).length;
-    return `🏋️‍♂️ Défi Push-ups : Jour ${nombre}\n` +
-           `💪 Total : ${total} push-ups\n` +
-           `✅ ${completedDaysCount} jours complétés\n` +
-           `🎯 Objectif : 365 jours\n` +
-           `#DéfiPushups #Fitness`;
+// Fonction pour calculer le total des push-ups
+function calculateTotalPushups() {
+    return Object.values(completedDays).reduce((total, pushups) => total + pushups, 0);
 }
 
-// Fonction pour copier du texte
-function copyToClipboard(text) {
-    // Créer un élément temporaire
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    
-    // S'assurer qu'il est hors de la vue
-    textArea.style.position = 'fixed';
-    textArea.style.left = '-9999px';
-    textArea.style.top = '0';
-    
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-
-    try {
-        document.execCommand('copy');
-        return true;
-    } catch (err) {
-        return false;
-    } finally {
-        document.body.removeChild(textArea);
-    }
+// Fonction pour mettre à jour l'affichage du total
+function updateTotalDisplay() {
+    const totalPushups = document.getElementById('totalPushups');
+    totalPushups.textContent = calculateTotalPushups();
 }
-
-// Gestionnaire de partage pour chaque plateforme
-document.querySelectorAll('.social-button').forEach(button => {
-    button.addEventListener('click', () => {
-        const platform = button.dataset.platform;
-        const message = createShareMessage();
-
-        if (platform === 'copy') {
-            const success = copyToClipboard(message);
-            
-            // Changer le texte et l'icône du bouton
-            const originalContent = button.innerHTML;
-            
-            if (success) {
-                button.innerHTML = '<i class="fas fa-check"></i> Copié !';
-                button.classList.add('copied');
-                notification.textContent = '✅ Texte copié !';
-            } else {
-                button.innerHTML = '<i class="fas fa-times"></i> Erreur';
-                notification.textContent = '❌ Erreur lors de la copie';
-            }
-            
-            // Afficher la notification
-            notification.style.display = 'block';
-            
-            // Cacher la notification et restaurer le bouton après 2 secondes
-            setTimeout(() => {
-                notification.style.display = 'none';
-                button.innerHTML = originalContent;
-                button.classList.remove('copied');
-            }, 2000);
-        }
-        
-        // Cacher les options de partage
-        shareOptions.classList.remove('visible');
-    });
-});
 
 // Détecter iOS et afficher les instructions d'installation appropriées
 function detectiOS() {
@@ -460,7 +452,29 @@ function verifierJour() {
     }
     
     // Mettre à jour l'affichage
+    const nombreElement = document.getElementById('nombre');
+    const jourElement = document.getElementById('jour');
     nombreElement.textContent = nombre;
     jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
     updateCalendar();
 }
+
+// Vérifier toutes les heures si un jour est passé
+setInterval(verifierJour, 3600000); // 3600000 ms = 1 heure
+
+// Force le rafraîchissement des données au chargement
+window.addEventListener('load', () => {
+    // Effacer le cache local si nécessaire
+    if (localStorage.getItem('lastUpdate') !== getLocalDateString()) {
+        localStorage.setItem('lastUpdate', getLocalDateString());
+        nombre = calculateDayNumber();
+        localStorage.setItem('nombre', nombre);
+        
+        // Mettre à jour l'affichage
+        const nombreElement = document.getElementById('nombre');
+        const jourElement = document.getElementById('jour');
+        nombreElement.textContent = nombre;
+        jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
+        updateCalendar();
+    }
+});
