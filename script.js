@@ -317,36 +317,41 @@ document.querySelectorAll('.social-button').forEach(button => {
     });
 });
 
-// Gérer l'installation PWA
+// Variables globales pour l'installation PWA
 let deferredPrompt;
 const installButton = document.getElementById('installButton');
 
+// Gérer l'installation PWA
 window.addEventListener('beforeinstallprompt', (e) => {
-    // Empêcher Chrome 67 et versions antérieures d'afficher automatiquement l'invite
+    // Empêcher l'affichage automatique
     e.preventDefault();
-    // Stocker l'événement pour qu'il puisse être déclenché plus tard
+    // Stocker l'événement
     deferredPrompt = e;
-    // Mettre à jour l'interface pour informer l'utilisateur qu'il peut installer l'application
+    // Afficher le bouton d'installation
     installButton.style.display = 'inline-flex';
 });
 
+// Gérer le clic sur le bouton d'installation
 installButton.addEventListener('click', async () => {
     if (!deferredPrompt) {
         return;
     }
-    // Montrer l'invite
+    // Afficher le prompt d'installation
     deferredPrompt.prompt();
-    // Attendre que l'utilisateur réponde à l'invite
+    // Attendre la réponse de l'utilisateur
     const { outcome } = await deferredPrompt.userChoice;
-    // On n'a plus besoin de l'événement
+    // Nettoyer
     deferredPrompt = null;
     // Cacher le bouton
     installButton.style.display = 'none';
 });
 
+// Gérer l'installation réussie
 window.addEventListener('appinstalled', () => {
-    // Cacher le bouton d'installation
+    // Cacher le bouton
     installButton.style.display = 'none';
-    // Effacer le deferredPrompt
+    // Nettoyer
     deferredPrompt = null;
+    // Afficher un message de succès
+    alert('Application installée avec succès !');
 });

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <!-- Fond -->
+    <rect width="512" height="512" fill="#007AFF" rx="128"/>
+    
+    <!-- Cercle intérieur -->
+    <circle cx="256" cy="256" r="200" fill="#000000" opacity="0.1"/>
+    
+    <!-- Texte 365 -->
+    <text x="256" y="280" 
+          font-family="Arial Black, sans-serif" 
+          font-size="160" 
+          fill="white" 
+          text-anchor="middle" 
+          font-weight="bold">365</text>
+    
+    <!-- Icône pompes stylisée -->
+    <path d="M256 340 
+             C220 340, 190 350, 170 370
+             L150 350
+             C180 320, 220 310, 256 310
+             C292 310, 332 320, 362 350
+             L342 370
+             C322 350, 292 340, 256 340Z" 
+          fill="white" opacity="0.9"/>
+</svg>

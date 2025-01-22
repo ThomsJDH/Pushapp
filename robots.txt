@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pushup365.netlify.app/sitemap.xml

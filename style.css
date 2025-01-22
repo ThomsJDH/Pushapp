@@ -360,6 +360,14 @@ label {
     margin: 10px 0 30px;
     text-align: center;
     font-style: italic;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.author:hover {
+    transform: translateY(-2px);
+    text-shadow: 0 0 10px rgba(0, 122, 255, 0.3);
 }
 
 .install-button {
@@ -384,4 +392,59 @@ label {
 
 .install-button i {
     font-size: 1.2rem;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    background-color: #0d0d0d;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgb(49, 48, 48);
+}
+
+/* Styles pour la page de confidentialité */
+.privacy-content {
+    text-align: left;
+    margin: 20px 0;
+    color: #ffffff;
+}
+
+.privacy-content h2 {
+    color: #007AFF;
+    margin-top: 30px;
+}
+
+.privacy-content ul {
+    list-style-type: disc;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+.privacy-content a {
+    color: #007AFF;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.privacy-content a:hover {
+    text-decoration: underline;
+}
+
+.back-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007AFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
 }

@@ -3,14 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#007AFF">
-    <meta name="mobile-web-app-capable" content="yes">
+    <title>Challenge Push-ups 365 Jours - Défi Fitness par Thomas</title>
+    <meta name="description" content="Relevez le défi des 365 jours de pompes ! Commencez avec 1 pompe et progressez jour après jour. Application créée par Thomas pour vous motiver dans votre transformation physique.">
+    <meta name="keywords" content="challenge pompes, push-ups challenge, fitness, musculation, exercice quotidien, transformation physique, 365 jours, Thomas">
+    <meta name="author" content="Thomas">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pushup365.netlify.app/">
+    <meta property="og:title" content="Challenge Push-ups 365 Jours - Défi Fitness par Thomas">
+    <meta property="og:description" content="Relevez le défi des 365 jours de pompes ! Commencez avec 1 pompe et progressez jour après jour.">
+    <meta property="og:image" content="https://pushup365.netlify.app/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://pushup365.netlify.app/">
+    <meta property="twitter:title" content="Challenge Push-ups 365 Jours - Défi Fitness par Thomas">
+    <meta property="twitter:description" content="Relevez le défi des 365 jours de pompes ! Commencez avec 1 pompe et progressez jour après jour.">
+    <meta property="twitter:image" content="https://pushup365.netlify.app/og-image.jpg">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://pushup365.netlify.app/">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Challenge Push-ups</title>
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/png" href="/icon-192.png">
-    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -18,17 +44,12 @@
     <div id="compteur">
         <div class="container">
             <h1>Challenge Push-ups</h1>
-            <p class="description">Relevez le défi des push-ups sur 365 jours ! Commencez doucement et progressez chaque jour pour atteindre vos objectifs de fitness. Une application simple et efficace pour suivre votre progression quotidienne.</p>
-            
-            <div class="author">Créé par Thomas</div>
-            
-            <button id="installButton" class="install-button" style="display: none;">
-                <i class="fas fa-download"></i> Installer l'application
-            </button>
+            <a href="https://www.instagram.com/thoms.jdh/" target="_blank" class="author">Créé par Thomas</a>
             
             <div id="jour" class="day-counter">Jour 1</div>
             <h1 id="nombre">0</h1>
             <p>push-ups</p>
+            
             <div class="checkbox-container">
                 <input type="checkbox" id="completed" name="completed">
                 <label for="completed">Complété aujourd'hui</label>
@@ -68,6 +89,17 @@
                     </div>
                     <div id="calendar-days" class="calendar-days"></div>
                 </div>
+            </div>
+
+            <div class="install-container">
+                <button id="installButton" class="install-button" style="display: none;">
+                    <i class="fas fa-download"></i> Installer l'application
+                </button>
+            </div>
+
+            <div class="description">
+                <h3>À propos du Challenge</h3>
+                <p>Relevez le défi des push-ups sur 365 jours ! Commencez doucement et progressez chaque jour pour atteindre vos objectifs de fitness. Une application simple et efficace pour suivre votre progression quotidienne.</p>
             </div>
         </div>
     </div>
