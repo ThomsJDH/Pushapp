@@ -42,27 +42,31 @@
 <body>
     <div id="compteur">
         <div class="container">
-            <h1>Challenge Push-ups</h1>
+            <div class="language-selector">
+                <button class="lang-btn" data-lang="fr">FR</button>
+                <button class="lang-btn" data-lang="en">EN</button>
+            </div>
+            <h1 data-i18n="title">Challenge Push-ups</h1>
             <a href="https://www.instagram.com/thoms.jdh/" target="_blank" class="author">
                 <!-- Instagram Icon -->
                 <svg class="social-icon" viewBox="0 0 448 512" width="16" height="16">
                     <path fill="currentColor" d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/>
                 </svg>
-                Créé par Thomas
+                <span data-i18n="created-by">Créé par Thomas</span>
             </a>
             
-            <div id="jour" class="day-counter">Jour 1</div>
+            <div id="jour" class="day-counter" data-i18n="day">Jour 1</div>
             <h1 id="nombre">0</h1>
-            <p>push-ups</p>
+            <p data-i18n="pushups">push-ups</p>
             
             <div class="checkbox-container">
                 <input type="checkbox" id="completed" name="completed">
-                <label for="completed">Complété aujourd'hui</label>
+                <label for="completed" data-i18n="completed">Complété aujourd'hui</label>
             </div>
 
             <div class="stats-container">
                 <div class="total-pushups">
-                    <h3>Total des push-ups</h3>
+                    <h3 data-i18n="total-pushups">Total des push-ups</h3>
                     <div id="totalPushups" class="total-number">0</div>
                 </div>
                 
@@ -72,7 +76,7 @@
                         <svg class="social-icon" viewBox="0 0 512 512" width="16" height="16">
                             <path fill="currentColor" d="M476.71 88.47l-53.96-53.96c-6.24-6.24-16.38-6.24-22.62 0l-77.89 77.89-77.89-77.89c-6.24-6.24-16.38-6.24-22.62 0l-53.96 53.96c-6.24 6.24-6.24 16.38 0 22.62l36.14 36.14c6.24 6.24 16.38 6.24 22.62 0l77.89-77.89 77.89 77.89c6.24 6.24 16.38 6.24 22.62 0l36.14-36.14c6.24-6.24 6.24-16.38 0-22.62z"/>
                         </svg>
-                        Partager ma progression
+                        <span data-i18n="share">Partager ma progression</span>
                     </button>
                     <div id="shareOptions" class="share-options">
                         <button class="social-button copy" data-platform="copy">
@@ -80,7 +84,7 @@
                             <svg class="social-icon" viewBox="0 0 512 512" width="16" height="16">
                                 <path fill="currentColor" d="M464 64H272V192H64V64H0V224H64V416H272V224H464V416H512V224H464V64Z"/>
                             </svg>
-                            Copier
+                            <span data-i18n="copy">Copier</span>
                         </button>
                     </div>
                 </div>
@@ -116,19 +120,19 @@
 
             <div class="install-container">
                 <div id="iosInstall" class="ios-install-instructions" style="display: none;">
-                    Pour installer l'application sur iOS :
+                    <span data-i18n="ios-install-title">Pour installer l'application sur iOS :</span>
                     <ol>
-                        <li>Appuyez sur <svg class="share-icon" viewBox="0 0 24 24" width="16" height="16">
+                        <li><span data-i18n="ios-install-step1">Appuyez sur</span> <svg class="share-icon" viewBox="0 0 24 24" width="16" height="16">
                             <path fill="currentColor" d="M16 5l-1.42 1.42-1.59-1.59V16h-1.98V4.83L9.42 6.42 8 5l4-4 4 4zm4 5v11c0 1.1-.9 2-2 2H6c-1.11 0-2-.9-2-2V10c0-1.11.89-2 2-2h3v2H6v11h12V10h-3V8h3c1.1 0 2 .89 2 2z"/>
-                        </svg> dans Safari</li>
-                        <li>Choisissez "Sur l'écran d'accueil"</li>
+                        </svg> <span data-i18n="ios-install-step1-safari">dans Safari</span></li>
+                        <li><span data-i18n="ios-install-step2">Choisissez "Sur l'écran d'accueil"</span></li>
                     </ol>
                 </div>
             </div>
 
             <div class="description">
-                <h3>À propos du Challenge</h3>
-                <p>Relevez le défi des push-ups sur 365 jours ! Commencez doucement et progressez chaque jour pour atteindre vos objectifs de fitness. Une application simple et efficace pour suivre votre progression quotidienne. N'oubliez pas d'Épingler sur votre écran d'accueil !</p>
+                <h3 data-i18n="about-title">À propos du Challenge</h3>
+                <p data-i18n="about-description">Relevez le défi des push-ups sur 365 jours ! Commencez doucement et progressez chaque jour pour atteindre vos objectifs de fitness. Une application simple et efficace pour suivre votre progression quotidienne. N'oubliez pas d'épingler sur votre écran d'accueil !</p>
             </div>
         </div>
     </div>

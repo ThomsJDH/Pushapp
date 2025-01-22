@@ -1,13 +1,80 @@
 // Réinitialiser complètement le localStorage
 // localStorage.clear();
 
+// Traductions
+const translations = {
+    fr: {
+        'title': 'Challenge Push-ups',
+        'created-by': 'Créé par Thomas',
+        'day': 'Jour',
+        'pushups': 'push-ups',
+        'completed': 'Complété aujourd\'hui',
+        'total-pushups': 'Total des push-ups',
+        'share': 'Partager ma progression',
+        'copy': 'Copier',
+        'ios-install-title': 'Pour installer l\'application sur iOS :',
+        'ios-install-step1': 'Appuyez sur',
+        'ios-install-step1-safari': 'dans Safari',
+        'ios-install-step2': 'Choisissez "Sur l\'écran d\'accueil"',
+        'about-title': 'À propos du Challenge',
+        'about-description': 'Relevez le défi des push-ups sur 365 jours ! Commencez doucement et progressez chaque jour pour atteindre vos objectifs de fitness. Une application simple et efficace pour suivre votre progression quotidienne. N\'oubliez pas d\'épingler sur votre écran d\'accueil !',
+        'weekdays': ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
+    },
+    en: {
+        'title': 'Push-ups Challenge',
+        'created-by': 'Created by Thomas',
+        'day': 'Day',
+        'pushups': 'push-ups',
+        'completed': 'Completed today',
+        'total-pushups': 'Total push-ups',
+        'share': 'Share my progress',
+        'copy': 'Copy',
+        'ios-install-title': 'To install the app on iOS:',
+        'ios-install-step1': 'Tap',
+        'ios-install-step1-safari': 'in Safari',
+        'ios-install-step2': 'Choose "Add to Home Screen"',
+        'about-title': 'About the Challenge',
+        'about-description': 'Take on the 365-day push-up challenge! Start slowly and progress each day to reach your fitness goals. A simple and effective app to track your daily progress. Don\'t forget to pin it to your home screen!',
+        'weekdays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    }
+};
+
+// Langue par défaut
+let currentLang = localStorage.getItem('language') || 'fr';
+
+// Fonction pour mettre à jour la langue active dans l'interface
+function updateActiveLanguageButton() {
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang);
+    });
+}
+
+// Fonction pour traduire l'interface
+function translateUI() {
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (translations[currentLang][key]) {
+            if (key === 'day') {
+                element.textContent = `${translations[currentLang][key]} ${nombre}`;
+            } else {
+                element.textContent = translations[currentLang][key];
+            }
+        }
+    });
+    
+    // Mettre à jour les jours de la semaine dans le calendrier
+    document.querySelectorAll('.weekday').forEach((element, index) => {
+        element.textContent = translations[currentLang].weekdays[index];
+    });
+    
+    updateActiveLanguageButton();
+    updateCalendar(); // Mettre à jour le calendrier après la traduction
+}
+
 // Fonction pour obtenir la date locale au format YYYY-MM-DD
 function getLocalDateString() {
-    // Utiliser la date locale de l'utilisateur
     const now = new Date();
-    // Obtenir le décalage horaire en minutes
     const timeZoneOffset = now.getTimezoneOffset();
-    // Ajuster la date en fonction du fuseau horaire
     const localDate = new Date(now.getTime() - (timeZoneOffset * 60000));
     return localDate.toISOString().split('T')[0];
 }
@@ -25,7 +92,6 @@ function calculateDayNumber() {
     const localNow = new Date(now.getTime() - (timeZoneOffset * 60000));
     const start = new Date(startDate);
     
-    // Réinitialiser les heures pour une comparaison juste
     localNow.setHours(0, 0, 0, 0);
     start.setHours(0, 0, 0, 0);
     
@@ -39,7 +105,6 @@ function calculateDayNumberForDate(date) {
     const targetDate = new Date(date);
     const start = new Date(startDate);
     
-    // Réinitialiser les heures pour une comparaison juste
     targetDate.setHours(0, 0, 0, 0);
     start.setHours(0, 0, 0, 0);
     
@@ -48,84 +113,76 @@ function calculateDayNumberForDate(date) {
     return diffDays;
 }
 
-// Initialiser le jour actuel
-nombre = calculateDayNumber();
-localStorage.setItem('nombre', nombre);
-
-// Sauvegarder la date de début si elle n'existe pas
-if (!localStorage.getItem('startDate')) {
-    localStorage.setItem('startDate', startDate);
-}
-
-const nombreElement = document.getElementById('nombre');
-const jourElement = document.getElementById('jour');
-const completedCheckbox = document.getElementById('completed');
-const totalPushups = document.getElementById('totalPushups');
-
-// Vérifier si un jour est passé depuis la dernière visite
-function verifierJour() {
-    const aujourdhui = getLocalDateString();
-    if (aujourdhui !== dernierJour) {
-        console.log('Changement de jour détecté');
-        console.log('Ancien jour:', dernierJour);
-        console.log('Nouveau jour:', aujourdhui);
-        console.log('Fuseau horaire:', Intl.DateTimeFormat().resolvedOptions().timeZone);
-        
-        // Réinitialiser la case à cocher pour le nouveau jour
-        completedCheckbox.checked = false;
-        localStorage.setItem('completedToday', 'false');
-        
-        // Mettre à jour le dernier jour
-        dernierJour = aujourdhui;
-        nombre = calculateDayNumber();
-        
-        // Sauvegarder les nouvelles valeurs
-        localStorage.setItem('dernierJour', dernierJour);
-        localStorage.setItem('nombre', nombre);
+// Initialisation au chargement de la page
+document.addEventListener('DOMContentLoaded', () => {
+    const nombreElement = document.getElementById('nombre');
+    const jourElement = document.getElementById('jour');
+    const completedCheckbox = document.getElementById('completed');
+    const totalPushups = document.getElementById('totalPushups');
+    
+    // Initialiser le jour actuel
+    nombre = calculateDayNumber();
+    localStorage.setItem('nombre', nombre);
+    
+    // Sauvegarder la date de début si elle n'existe pas
+    if (!localStorage.getItem('startDate')) {
+        localStorage.setItem('startDate', startDate);
     }
     
-    // Mettre à jour l'affichage
+    // Charger l'état de la case à cocher depuis le localStorage
+    const isCompletedToday = localStorage.getItem('completedToday') === 'true';
+    completedCheckbox.checked = isCompletedToday;
+    
+    // Afficher le nombre initial et le jour
     nombreElement.textContent = nombre;
-    jourElement.textContent = `Jour ${nombre}`;
-    updateCalendar();
-}
+    
+    // Mettre à jour l'affichage initial du total
+    totalPushups.textContent = calculateTotalPushups();
+    
+    // Gestionnaire de changement de langue
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentLang = btn.dataset.lang;
+            localStorage.setItem('language', currentLang);
+            translateUI();
+        });
+    });
+    
+    // Initialiser la traduction
+    translateUI();
+    
+    // Détecter iOS
+    detectiOS();
+    
+    // Gestionnaire de la case à cocher
+    completedCheckbox.addEventListener('change', (e) => {
+        const today = getLocalDateString();
+        localStorage.setItem('completedToday', e.target.checked);
+        
+        if (e.target.checked) {
+            completedDays[today] = nombre;
+        } else {
+            delete completedDays[today];
+        }
+        
+        localStorage.setItem('completedDays', JSON.stringify(completedDays));
+        totalPushups.textContent = calculateTotalPushups();
+        updateCalendar();
+    });
+    
+    // Vérifier le changement de jour
+    verifierJour();
+});
 
-// Calculer le total des push-ups
+// Fonction pour calculer le total des push-ups
 function calculateTotalPushups() {
     return Object.values(completedDays).reduce((total, pushups) => total + pushups, 0);
 }
 
-// Mettre à jour l'affichage du total
+// Fonction pour mettre à jour l'affichage du total
 function updateTotalDisplay() {
     totalPushups.textContent = calculateTotalPushups();
 }
-
-// Charger l'état de la case à cocher depuis le localStorage
-const isCompletedToday = localStorage.getItem('completedToday') === 'true';
-completedCheckbox.checked = isCompletedToday;
-
-// Afficher le nombre initial et le jour
-nombreElement.textContent = nombre;
-jourElement.textContent = `Jour ${nombre}`;
-
-// Mettre à jour l'affichage initial du total
-updateTotalDisplay();
-
-// Gérer le changement de la case à cocher
-completedCheckbox.addEventListener('change', (e) => {
-    const today = getLocalDateString();
-    localStorage.setItem('completedToday', e.target.checked);
-    
-    if (e.target.checked) {
-        completedDays[today] = nombre;
-    } else {
-        delete completedDays[today];
-    }
-    
-    localStorage.setItem('completedDays', JSON.stringify(completedDays));
-    updateTotalDisplay();
-    updateCalendar();
-});
 
 // Calendrier
 let currentDate = new Date();
@@ -137,7 +194,8 @@ function updateCalendar() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     
-    currentMonthElement.textContent = new Date(year, month).toLocaleDateString('fr-FR', {
+    // Traduire le nom du mois selon la langue actuelle
+    currentMonthElement.textContent = new Date(year, month).toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-US', {
         month: 'long',
         year: 'numeric'
     });
@@ -147,6 +205,11 @@ function updateCalendar() {
     const startingDay = firstDay.getDay();
     
     calendarDays.innerHTML = '';
+    
+    // Mettre à jour les en-têtes des jours de la semaine
+    document.querySelectorAll('.weekday').forEach((element, index) => {
+        element.textContent = translations[currentLang].weekdays[index];
+    });
     
     // Jours vides du début du mois
     for (let i = 0; i < startingDay; i++) {
@@ -232,7 +295,7 @@ window.addEventListener('load', () => {
         
         // Mettre à jour l'affichage
         nombreElement.textContent = nombre;
-        jourElement.textContent = `Jour ${nombre}`;
+        jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
         updateCalendar();
     }
 });
@@ -346,3 +409,31 @@ function detectiOS() {
 
 // Appeler la détection au chargement
 window.addEventListener('load', detectiOS);
+
+// Vérifier si un jour est passé depuis la dernière visite
+function verifierJour() {
+    const aujourdhui = getLocalDateString();
+    if (aujourdhui !== dernierJour) {
+        console.log('Changement de jour détecté');
+        console.log('Ancien jour:', dernierJour);
+        console.log('Nouveau jour:', aujourdhui);
+        console.log('Fuseau horaire:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+        
+        // Réinitialiser la case à cocher pour le nouveau jour
+        completedCheckbox.checked = false;
+        localStorage.setItem('completedToday', 'false');
+        
+        // Mettre à jour le dernier jour
+        dernierJour = aujourdhui;
+        nombre = calculateDayNumber();
+        
+        // Sauvegarder les nouvelles valeurs
+        localStorage.setItem('dernierJour', dernierJour);
+        localStorage.setItem('nombre', nombre);
+    }
+    
+    // Mettre à jour l'affichage
+    nombreElement.textContent = nombre;
+    jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
+    updateCalendar();
+}
