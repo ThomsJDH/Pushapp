@@ -102,6 +102,7 @@ p[data-i18n="pushups"] {
     margin: 20px 0;
     box-shadow: 0 4px 15px var(--shadow-color);
     backdrop-filter: blur(10px);
+    animation: fadeIn 0.5s ease-out;
 }
 
 .stats-card {
@@ -110,6 +111,7 @@ p[data-i18n="pushups"] {
     padding: 20px;
     margin: 20px 0;
     box-shadow: 0 4px 15px var(--shadow-color);
+    animation: fadeIn 0.5s ease-out;
 }
 
 .calendar-container {
@@ -118,6 +120,7 @@ p[data-i18n="pushups"] {
     padding: 20px;
     margin-top: 20px;
     box-shadow: 0 4px 15px var(--shadow-color);
+    animation: fadeIn 0.5s ease-out;
 }
 
 #nombre {
@@ -133,6 +136,7 @@ p[data-i18n="pushups"] {
     font-weight: bold;
     color: var(--primary-color);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    animation: pulse 2s infinite;
 }
 
 .calendar-grid {
@@ -178,6 +182,7 @@ p[data-i18n="pushups"] {
     background: var(--primary-color);
     color: white;
     box-shadow: 0 2px 8px rgba(255, 62, 62, 0.3);
+    animation: scaleIn 0.3s ease-out;
 }
 
 .calendar-day.today {
@@ -219,4 +224,92 @@ p[data-i18n="pushups"] {
     font-size: 1.2rem;
     font-weight: 500;
     color: var(--text-color);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Notifications */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary-color);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.notification.success {
+    background: #4CAF50;
+}
+
+.notification.error {
+    background: #f44336;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+
+    #nombre {
+        font-size: 3rem;
+    }
+
+    .calendar-day {
+        font-size: 0.8rem;
+    }
+
+    .calendar-grid {
+        gap: 4px;
+    }
+}
+
+/* Dark mode optimizations */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --shadow-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .counter-card, .stats-card, .calendar-container {
+        backdrop-filter: blur(10px);
+    }
 }
