@@ -1,14 +1,17 @@
-const CACHE_NAME = 'pushup-cache-v1';
+const CACHE_NAME = 'pushup-cache-v2';
 const urlsToCache = [
   '/',
   '/index.html',
+  '/app.html',
   '/style.css',
+  '/global.css',
   '/script.js',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
   '/favicon.png',
   '/apple-touch-icon.png',
+  '/hero-bg.jpg',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'
 ];
 
@@ -20,6 +23,8 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
+  // Force l'activation immédiate du nouveau service worker
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
@@ -28,11 +33,15 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName); // Supprime l'ancien cache
+            console.log('Suppression de l\'ancien cache:', cacheName);
+            return caches.delete(cacheName);
           }
         })
       );
-    }).then(() => self.clients.claim()) // Prend le contrôle immédiatement
+    }).then(() => {
+      console.log('Nouveau cache actif:', CACHE_NAME);
+      return self.clients.claim();
+    })
   );
 });
 
@@ -51,10 +60,12 @@ self.addEventListener('fetch', event => {
 
         return fetch(event.request).then(
           response => {
+            // Vérifie que la réponse est valide
             if(!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
 
+            // Clone la réponse
             const responseToCache = response.clone();
 
             caches.open(CACHE_NAME)
@@ -64,15 +75,7 @@ self.addEventListener('fetch', event => {
 
             return response;
           }
-        ).catch(() => {
-          // En cas d'erreur de fetch, on retourne une réponse par défaut pour Font Awesome
-          if (event.request.url.includes('font-awesome')) {
-            return new Response('', {
-              status: 200,
-              statusText: 'OK'
-            });
-          }
-        });
+        );
       })
   );
 });
