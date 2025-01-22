@@ -320,28 +320,41 @@ label {
 /* Tabs */
 .tabs {
     display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin: 1rem 0;
+    gap: 10px;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px;
+    border-radius: 10px;
 }
 
 .tab-button {
-    background: none;
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    background: transparent;
     border: none;
-    padding: 0.5rem 1rem;
-    color: var(--text-color);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
     cursor: pointer;
-    border-bottom: 2px solid transparent;
     transition: all 0.3s ease;
 }
 
-.tab-button.active {
-    border-bottom-color: var(--accent-color);
-    color: var(--accent-color);
+.tab-button:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
 }
 
+.tab-button.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Tab Content */
 .tab-content {
     display: none;
+    position: relative;
+    min-height: 300px;
 }
 
 .tab-content.active {
@@ -362,7 +375,7 @@ label {
     align-items: center;
     gap: 0.5rem;
     padding: 0.8rem 1.5rem;
-    background: var(--accent-color);
+    background: var(--primary-color);
     border: none;
     border-radius: 8px;
     color: white;
@@ -372,12 +385,15 @@ label {
 
 .share-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(255, 62, 62, 0.3);
 }
 
 .share-options {
     display: flex;
     gap: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
 }
 
 .social-button {
@@ -385,21 +401,22 @@ label {
     align-items: center;
     gap: 0.5rem;
     padding: 0.6rem 1rem;
-    background: var(--background-color);
-    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
     border-radius: 6px;
-    color: var(--text-color);
+    color: white;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .social-button:hover {
-    background: var(--hover-color);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .social-icon {
     width: 20px;
     height: 20px;
+    fill: currentColor;
 }
 
 .toast {
@@ -407,7 +424,7 @@ label {
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--accent-color);
+    background: var(--primary-color);
     color: white;
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
