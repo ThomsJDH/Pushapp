@@ -1,18 +1,24 @@
-const CACHE_NAME = 'pushups-app-v2';
+const CACHE_NAME = 'pushup-cache-v1';
 const urlsToCache = [
   '/',
   '/index.html',
   '/style.css',
   '/script.js',
+  '/manifest.json',
   '/icon-192.png',
-  '/manifest.json'
+  '/icon-512.png',
+  '/favicon.png',
+  '/apple-touch-icon.png',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-      .then(() => self.skipWaiting()) // Force l'activation immédiate
+      .then(cache => {
+        console.log('Cache ouvert');
+        return cache.addAll(urlsToCache);
+      })
   );
 });
 
@@ -39,39 +45,33 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Vérifie si la requête est pour script.js
-        if (event.request.url.endsWith('script.js')) {
-          // Pour script.js, toujours aller chercher la dernière version
-          return fetch(event.request).then(networkResponse => {
-            // Clone la réponse car elle ne peut être utilisée qu'une fois
-            const responseToCache = networkResponse.clone();
-            
+        if (response) {
+          return response;
+        }
+
+        return fetch(event.request).then(
+          response => {
+            if(!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
+
+            const responseToCache = response.clone();
+
             caches.open(CACHE_NAME)
               .then(cache => {
                 cache.put(event.request, responseToCache);
               });
 
-            return networkResponse;
-          }).catch(() => response);
-        }
-        
-        // Pour les autres fichiers, utiliser le cache d'abord
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).then(networkResponse => {
-          // Ne pas mettre en cache les requêtes qui ont échoué
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-            return networkResponse;
+            return response;
           }
-
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
+        ).catch(() => {
+          // En cas d'erreur de fetch, on retourne une réponse par défaut pour Font Awesome
+          if (event.request.url.includes('font-awesome')) {
+            return new Response('', {
+              status: 200,
+              statusText: 'OK'
             });
-
-          return networkResponse;
+          }
         });
       })
   );

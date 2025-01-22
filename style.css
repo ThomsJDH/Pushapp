@@ -317,6 +317,27 @@ label {
     background: linear-gradient(135deg, #28a745, #218838);
 }
 
+.social-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.social-icon path {
+    fill: currentColor;
+}
+
+button .social-icon {
+    margin-right: 5px;
+}
+
+.author .social-icon {
+    margin-right: 5px;
+    width: 14px;
+    height: 14px;
+}
+
 /* Notification de copie */
 .copy-notification {
     position: fixed;
@@ -368,6 +389,35 @@ label {
 .author:hover {
     transform: translateY(-2px);
     text-shadow: 0 0 10px rgba(0, 122, 255, 0.3);
+}
+
+.install-container {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.install-button {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.install-button:hover {
+    background-color: #45a049;
+}
+
+.install-button svg {
+    width: 20px;
+    height: 20px;
 }
 
 .install-button {

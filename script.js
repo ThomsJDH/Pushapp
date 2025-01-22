@@ -34,6 +34,20 @@ function calculateDayNumber() {
     return diffDays;
 }
 
+// Calculer le nombre de jours pour une date spécifique
+function calculateDayNumberForDate(date) {
+    const targetDate = new Date(date);
+    const start = new Date(startDate);
+    
+    // Réinitialiser les heures pour une comparaison juste
+    targetDate.setHours(0, 0, 0, 0);
+    start.setHours(0, 0, 0, 0);
+    
+    const diffTime = targetDate.getTime() - start.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    return diffDays;
+}
+
 // Initialiser le jour actuel
 nombre = calculateDayNumber();
 localStorage.setItem('nombre', nombre);
@@ -156,8 +170,8 @@ function updateCalendar() {
         if (clickableDate <= currentDate) {
             dayElement.classList.add('clickable');
             
-            // Calculer le nombre de push-ups pour ce jour
-            const dayNumber = calculateDayNumber();
+            // Calculer le nombre de push-ups pour ce jour spécifique
+            const dayNumber = calculateDayNumberForDate(dateString);
             
             if (completedDays[dateString]) {
                 dayElement.classList.add('completed');
@@ -317,41 +331,35 @@ document.querySelectorAll('.social-button').forEach(button => {
     });
 });
 
-// Variables globales pour l'installation PWA
+// Installation PWA
 let deferredPrompt;
 const installButton = document.getElementById('installButton');
 
-// Gérer l'installation PWA
 window.addEventListener('beforeinstallprompt', (e) => {
-    // Empêcher l'affichage automatique
+    // Empêcher Chrome 67 et versions antérieures d'afficher automatiquement l'invite
     e.preventDefault();
-    // Stocker l'événement
+    // Stocker l'événement pour pouvoir le déclencher plus tard
     deferredPrompt = e;
     // Afficher le bouton d'installation
-    installButton.style.display = 'inline-flex';
+    installButton.style.display = 'flex';
 });
 
-// Gérer le clic sur le bouton d'installation
 installButton.addEventListener('click', async () => {
-    if (!deferredPrompt) {
-        return;
+    if (deferredPrompt) {
+        // Afficher l'invite d'installation
+        deferredPrompt.prompt();
+        // Attendre que l'utilisateur réponde à l'invite
+        const { outcome } = await deferredPrompt.userChoice;
+        // On n'a plus besoin de l'événement
+        deferredPrompt = null;
+        // Cacher le bouton d'installation
+        installButton.style.display = 'none';
     }
-    // Afficher le prompt d'installation
-    deferredPrompt.prompt();
-    // Attendre la réponse de l'utilisateur
-    const { outcome } = await deferredPrompt.userChoice;
-    // Nettoyer
-    deferredPrompt = null;
-    // Cacher le bouton
-    installButton.style.display = 'none';
 });
 
-// Gérer l'installation réussie
 window.addEventListener('appinstalled', () => {
-    // Cacher le bouton
+    // Cacher le bouton d'installation
     installButton.style.display = 'none';
-    // Nettoyer
+    // Effacer deferredPrompt
     deferredPrompt = null;
-    // Afficher un message de succès
-    alert('Application installée avec succès !');
 });
