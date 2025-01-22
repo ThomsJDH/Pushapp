@@ -3,8 +3,8 @@ body {
     padding: 20px;
     min-height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #000000;
-    color: #ffffff;
+    background-color: #fff;
+    color: #333;
     box-sizing: border-box;
 }
 
@@ -19,6 +19,7 @@ body {
     margin: 0;
     opacity: 0.8;
     font-weight: bold;
+    color: white;
 }
 
 #nombre {
@@ -33,6 +34,24 @@ p {
     opacity: 0.8;
 }
 
+h1[data-i18n="title"] {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.day-counter {
+    color: white;
+    font-size: 1.5rem;
+    margin: 1rem 0;
+}
+
+p[data-i18n="pushups"] {
+    color: white;
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+}
+
 .checkbox-container {
     margin: 20px 0;
     display: flex;
@@ -44,7 +63,7 @@ p {
 input[type="checkbox"] {
     width: 24px;
     height: 24px;
-    accent-color: #007AFF;
+    accent-color: #ff3e3e;
 }
 
 label {
@@ -54,18 +73,18 @@ label {
 
 /* Stats Container */
 .stats-container {
-    margin-top: 30px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
     padding: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: center;
+    background-color: #f5f5f5;
 }
 
 .total-pushups {
     text-align: center;
     margin-bottom: 30px;
     padding: 20px;
-    background: rgba(0, 122, 255, 0.1);
+    background: rgba(255, 69, 69, 0.1);
     border-radius: 12px;
 }
 
@@ -78,7 +97,7 @@ label {
 .total-number {
     font-size: 3rem;
     font-weight: bold;
-    color: #007AFF;
+    color: #ff3e3e;
     margin-top: 10px;
 }
 
@@ -111,7 +130,7 @@ label {
 }
 
 .tab-button.active {
-    background: #007AFF;
+    background: #ff3e3e;
     color: white;
 }
 
@@ -199,9 +218,10 @@ label {
     align-items: center;
     justify-content: center;
     font-size: 0.9rem;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #333;
     transition: all 0.3s ease;
 }
 
@@ -216,14 +236,16 @@ label {
 }
 
 .calendar-day.completed {
-    background-color: #007AFF;
-    border-color: #007AFF;
+    background-color: #ff3e3e;
+    border-color: #ff3e3e;
     color: white;
 }
 
 .calendar-day.today {
-    border-color: #007AFF;
+    border-color: #ff3e3e;
     border-width: 2px;
+    color: #ff3e3e;
+    font-weight: bold;
 }
 
 .calendar-day.inactive {
@@ -240,7 +262,7 @@ label {
 }
 
 .share-button {
-    background: #2196F3;
+    background: #ff3e3e;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -254,7 +276,7 @@ label {
 }
 
 .share-button:hover {
-    background: #1976D2;
+    background: #ff5555;
 }
 
 .share-options {
@@ -367,7 +389,7 @@ label {
 }
 
 .author {
-    color: #007AFF;
+    color: #ff3e3e;
     font-size: 1rem;
     margin: 10px 0 30px;
     text-align: center;
@@ -379,7 +401,7 @@ label {
 
 .author:hover {
     transform: translateY(-2px);
-    text-shadow: 0 0 10px rgba(0, 122, 255, 0.3);
+    text-shadow: 0 0 10px rgba(255, 62, 62, 0.3);
 }
 
 .ios-install-instructions {
@@ -416,7 +438,7 @@ label {
 }
 
 .privacy-content h2 {
-    color: #007AFF;
+    color: #ff3e3e;
     margin-top: 30px;
 }
 
@@ -427,7 +449,7 @@ label {
 }
 
 .privacy-content a {
-    color: #007AFF;
+    color: #ff3e3e;
     text-decoration: none;
     transition: all 0.3s ease;
 }
@@ -439,7 +461,7 @@ label {
 .back-button {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #007AFF;
+    background-color: #ff3e3e;
     color: white;
     text-decoration: none;
     border-radius: 5px;
@@ -448,7 +470,7 @@ label {
 }
 
 .back-button:hover {
-    background-color: #0056b3;
+    background-color: #ff5555;
     transform: translateY(-2px);
 }
 
@@ -686,4 +708,31 @@ label {
 /* Styles spécifiques pour iOS */
 .ios-install {
     border-left: 4px solid #007AFF; /* Couleur bleue d'iOS */
+}
+
+.stats-container {
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: center;
+    background-color: #f5f5f5;
+}
+
+.stats-number {
+    font-size: 2em;
+    font-weight: bold;
+    color: #ff3e3e;
+    margin: 10px 0;
+}
+
+.challenge-title {
+    color: #333;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.challenge-subtitle {
+    color: #666;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
 }
