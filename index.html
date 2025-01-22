@@ -117,14 +117,34 @@
             </div>
 
             <div class="install-container">
-                <div id="iosInstall" class="ios-install-instructions" style="display: none;">
-                    <span data-i18n="ios-install-title">Pour installer l'application sur iOS :</span>
-                    <ol>
-                        <li><span data-i18n="ios-install-step1">Appuyez sur</span> <svg class="share-icon" viewBox="0 0 24 24" width="16" height="16">
-                            <path fill="currentColor" d="M16 5l-1.42 1.42-1.59-1.59V16h-1.98V4.83L9.42 6.42 8 5l4-4 4 4zm4 5v11c0 1.1-.9 2-2 2H6c-1.11 0-2-.9-2-2V10c0-1.11.89-2 2-2h3v2H6v11h12V10h-3V8h3c1.1 0 2 .89 2 2z"/>
-                        </svg> <span data-i18n="ios-install-step1-safari">dans Safari</span></li>
-                        <li><span data-i18n="ios-install-step2">Choisissez "Sur l'écran d'accueil"</span></li>
-                    </ol>
+                <button id="installButton" class="install-button" style="display: none;">
+                    <svg class="social-icon" viewBox="0 0 24 24" width="16" height="16">
+                        <path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                    <span data-i18n="install">Installer l'application</span>
+                </button>
+                <div id="iosInstall" class="install-instructions ios-install" style="display: none;">
+                    <h3 data-i18n="ios-install-title">Pour installer l'application sur iOS :</h3>
+                    <p>
+                        <span data-i18n="ios-install-step1">1. Appuyez sur</span>
+                        <svg class="social-icon" viewBox="0 0 24 24" width="16" height="16">
+                            <path fill="currentColor" d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                        </svg>
+                        <span data-i18n="ios-install-step1-safari">dans Safari</span>
+                    </p>
+                    <p data-i18n="ios-install-step2">2. Choisissez "Sur l'écran d'accueil"</p>
+                </div>
+                <div id="androidInstall" class="install-instructions android-install" style="display: none;">
+                    <h3 data-i18n="android-install-title">Pour installer l'application sur Android :</h3>
+                    <p>
+                        <span data-i18n="android-install-step1">1. Dans Chrome, appuyez sur</span>
+                        <svg class="social-icon" viewBox="0 0 24 24" width="16" height="16">
+                            <path fill="currentColor" d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                        </svg>
+                        <span data-i18n="android-install-step1-chrome">en haut à droite</span>
+                    </p>
+                    <p data-i18n="android-install-step2">2. Sélectionnez "Installer l'application"</p>
+                    <p data-i18n="android-install-step3">3. Suivez les instructions à l'écran</p>
                 </div>
             </div>
 

@@ -2,8 +2,10 @@
     "name": "Challenge Push-ups",
     "short_name": "Push-ups",
     "description": "Défi des 365 jours de pompes par Thomas",
-    "start_url": "/",
+    "start_url": "/?source=pwa",
+    "id": "/?source=pwa",
     "display": "standalone",
+    "display_override": ["window-controls-overlay", "standalone"],
     "background_color": "#000000",
     "theme_color": "#000000",
     "orientation": "portrait",
@@ -26,7 +28,45 @@
             "purpose": "any maskable"
         }
     ],
+    "screenshots": [
+        {
+            "src": "screenshot1.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Challenge Push-ups sur ordinateur"
+        },
+        {
+            "src": "screenshot2.png",
+            "sizes": "720x1280",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Challenge Push-ups sur mobile"
+        }
+    ],
     "categories": ["fitness", "health", "lifestyle"],
     "lang": "fr",
-    "dir": "ltr"
+    "dir": "ltr",
+    "prefer_related_applications": false,
+    "shortcuts": [
+        {
+            "name": "Aujourd'hui",
+            "url": "/?source=shortcut",
+            "description": "Voir le défi du jour",
+            "icons": [
+                {
+                    "src": "icon-96.png",
+                    "sizes": "96x96",
+                    "type": "image/png"
+                }
+            ]
+        }
+    ],
+    "handle_links": "preferred",
+    "launch_handler": {
+        "client_mode": ["navigate-existing", "auto"]
+    },
+    "edge_side_panel": {
+        "preferred_width": 400
+    }
 }

@@ -1,5 +1,5 @@
 // Réinitialiser complètement le localStorage
-// localStorage.clear();
+localStorage.clear();
 
 // Traductions
 const translations = {
@@ -16,9 +16,15 @@ const translations = {
         'ios-install-step1': 'Appuyez sur',
         'ios-install-step1-safari': 'dans Safari',
         'ios-install-step2': 'Choisissez "Sur l\'écran d\'accueil"',
+        'android-install-title': 'Pour installer l\'application sur Android :',
+        'android-install-step1': '1. Dans Chrome, appuyez sur',
+        'android-install-step1-chrome': 'en haut à droite',
+        'android-install-step2': '2. Sélectionnez "Installer l\'application"',
+        'android-install-step3': '3. Suivez les instructions à l\'écran',
         'about-title': 'À propos du Challenge',
         'about-description': 'Relevez le défi des push-ups sur 365 jours ! Commencez doucement et progressez chaque jour pour atteindre vos objectifs de fitness. Une application simple et efficace pour suivre votre progression quotidienne. N\'oubliez pas d\'épingler sur votre écran d\'accueil !',
-        'weekdays': ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
+        'weekdays': ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+        'install': 'Installer l\'application'
     },
     en: {
         'title': 'Push-ups Challenge',
@@ -33,9 +39,15 @@ const translations = {
         'ios-install-step1': 'Tap',
         'ios-install-step1-safari': 'in Safari',
         'ios-install-step2': 'Choose "Add to Home Screen"',
+        'android-install-title': 'To install the app on Android:',
+        'android-install-step1': '1. In Chrome, tap',
+        'android-install-step1-chrome': 'at the top right',
+        'android-install-step2': '2. Select "Install app"',
+        'android-install-step3': '3. Follow the on-screen instructions',
         'about-title': 'About the Challenge',
         'about-description': 'Take on the 365-day push-up challenge! Start slowly and progress each day to reach your fitness goals. A simple and effective app to track your daily progress. Don\'t forget to pin it to your home screen!',
-        'weekdays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        'weekdays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        'install': 'Install App'
     }
 };
 
@@ -80,7 +92,7 @@ function getLocalDateString() {
 }
 
 // Initialiser ou récupérer les données sauvegardées
-let startDate = localStorage.getItem('startDate') || '2025-01-01';
+let startDate = '2025-01-01'; // Date de début corrigée pour 2025
 let nombre = 1;
 let dernierJour = localStorage.getItem('dernierJour') || getLocalDateString();
 let completedDays = JSON.parse(localStorage.getItem('completedDays')) || {};
@@ -90,27 +102,18 @@ function calculateDayNumber() {
     const now = new Date();
     const timeZoneOffset = now.getTimezoneOffset();
     const localNow = new Date(now.getTime() - (timeZoneOffset * 60000));
-    const start = new Date(startDate);
     
-    localNow.setHours(0, 0, 0, 0);
-    start.setHours(0, 0, 0, 0);
+    // On utilise directement le jour du mois
+    const day = localNow.getDate();
+    console.log('Jour du mois:', day);
     
-    const diffTime = localNow.getTime() - start.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    return diffDays;
+    return day;
 }
 
 // Calculer le nombre de jours pour une date spécifique
 function calculateDayNumberForDate(date) {
     const targetDate = new Date(date);
-    const start = new Date(startDate);
-    
-    targetDate.setHours(0, 0, 0, 0);
-    start.setHours(0, 0, 0, 0);
-    
-    const diffTime = targetDate.getTime() - start.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    return diffDays;
+    return targetDate.getDate();
 }
 
 // Initialisation au chargement de la page
@@ -136,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialiser la case à cocher
     completedCheckbox.checked = localStorage.getItem('completedToday') === 'true';
     
-    // Mettre à jour le total
+    // Mettre à jour le total des push-ups
     updateTotalDisplay();
     
     // Mettre à jour le calendrier
@@ -157,11 +160,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Gestion de la case à cocher
     completedCheckbox.addEventListener('change', () => {
         const today = getLocalDateString();
+        const todayNumber = calculateDayNumber(); // Utiliser le vrai numéro du jour
+        console.log('Jour actuel:', todayNumber);
+        console.log('CompletedDays avant:', completedDays);
+        
         if (completedCheckbox.checked) {
-            completedDays[today] = nombre;
+            completedDays[today] = todayNumber;
+            console.log('Ajout de', todayNumber, 'push-ups pour', today);
         } else {
             delete completedDays[today];
+            console.log('Suppression des push-ups pour', today);
         }
+        
+        console.log('CompletedDays après:', completedDays);
         localStorage.setItem('completedDays', JSON.stringify(completedDays));
         localStorage.setItem('completedToday', completedCheckbox.checked);
         updateTotalDisplay();
@@ -233,8 +244,177 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Éléments de partage non trouvés dans le DOM');
     }
 
+    // Variables pour l'installation PWA
+    let deferredPrompt;
+    const installButton = document.getElementById('installButton');
+    const iosInstall = document.getElementById('iosInstall');
+    const androidInstall = document.getElementById('androidInstall');
+
+    // Écouter l'événement beforeinstallprompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Empêcher Chrome 67 et versions antérieures d'afficher automatiquement l'invite
+        e.preventDefault();
+        // Stocker l'événement pour pouvoir le déclencher plus tard
+        deferredPrompt = e;
+        // Mettre à jour l'interface utilisateur pour afficher le bouton d'installation
+        installButton.style.display = 'flex';
+    });
+
+    // Gestionnaire de clic pour le bouton d'installation
+    installButton.addEventListener('click', async () => {
+        if (!deferredPrompt) {
+            return;
+        }
+        // Afficher l'invite d'installation
+        deferredPrompt.prompt();
+        // Attendre que l'utilisateur réponde à l'invite
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to the install prompt: ${outcome}`);
+        // On n'a plus besoin de l'invite, on la supprime
+        deferredPrompt = null;
+        // Cacher le bouton d'installation
+        installButton.style.display = 'none';
+    });
+
+    // Écouter l'événement appinstalled
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('Application installée avec succès');
+        // Cacher le bouton d'installation et les instructions iOS
+        installButton.style.display = 'none';
+        iosInstall.style.display = 'none';
+        androidInstall.style.display = 'none';
+    });
+
+    // Détecter le système d'exploitation et afficher les instructions appropriées
+    function detectDevice() {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isAndroid = /Android/.test(navigator.userAgent);
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                            window.navigator.standalone;
+        
+        const iosInstall = document.getElementById('iosInstall');
+        const androidInstall = document.getElementById('androidInstall');
+        const installButton = document.getElementById('installButton');
+        
+        if (!isStandalone) {
+            if (isIOS) {
+                iosInstall.style.display = 'block';
+                androidInstall.style.display = 'none';
+                installButton.style.display = 'none';
+                // Animation pour iOS
+                setTimeout(() => {
+                    iosInstall.classList.add('pulse');
+                    setTimeout(() => iosInstall.classList.remove('pulse'), 1000);
+                }, 2000);
+            } else if (isAndroid) {
+                androidInstall.style.display = 'block';
+                iosInstall.style.display = 'none';
+                // Le bouton d'installation natif sera géré par Chrome
+                // Animation pour Android
+                setTimeout(() => {
+                    androidInstall.classList.add('pulse');
+                    setTimeout(() => androidInstall.classList.remove('pulse'), 1000);
+                }, 2000);
+            }
+        } else {
+            // L'application est déjà installée
+            iosInstall.style.display = 'none';
+            androidInstall.style.display = 'none';
+            installButton.style.display = 'none';
+        }
+    }
+
+    // Détecter le système et afficher les instructions appropriées
+    detectDevice();
+    
     // Vérifier si un jour est passé
     verifierJour();
+
+    // Vérifier si l'application est en mode standalone (installée)
+    function isAppInstalled() {
+        return window.matchMedia('(display-mode: standalone)').matches || 
+               window.navigator.standalone || 
+               document.referrer.includes('android-app://');
+    }
+
+    // Détecter le mode d'affichage
+    function checkDisplayMode() {
+        if (isAppInstalled()) {
+            document.body.classList.add('standalone-mode');
+            // Masquer les éléments d'installation
+            if (installButton) installButton.style.display = 'none';
+            if (iosInstall) iosInstall.style.display = 'none';
+            if (androidInstall) androidInstall.style.display = 'none';
+        }
+    }
+
+    // Vérifier la connexion internet
+    function checkOnlineStatus() {
+        const updateOnlineStatus = () => {
+            const status = navigator.onLine;
+            document.body.classList.toggle('offline', !status);
+            
+            // Afficher une notification de statut
+            const notification = document.createElement('div');
+            notification.className = `status-notification ${status ? 'online' : 'offline'}`;
+            notification.textContent = status 
+                ? (currentLang === 'fr' ? '✅ Connexion rétablie' : '✅ Back online')
+                : (currentLang === 'fr' ? '⚠️ Mode hors ligne' : '⚠️ Offline mode');
+            
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => document.body.removeChild(notification), 500);
+            }, 2000);
+        };
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus(); // Vérifier le statut initial
+    }
+
+    // Amélioration de la détection iOS
+    function detectiOS() {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                            window.navigator.standalone;
+        
+        if (isIOS && !isStandalone) {
+            iosInstall.style.display = 'block';
+            // Ajouter une animation subtile pour attirer l'attention
+            setTimeout(() => {
+                iosInstall.classList.add('pulse');
+                setTimeout(() => iosInstall.classList.remove('pulse'), 1000);
+            }, 2000);
+        }
+    }
+
+    // Initialisation améliorée
+    checkDisplayMode();
+    checkOnlineStatus();
+    
+    // Détecter iOS et afficher les instructions appropriées
+    detectiOS();
+    
+    // Écouter les changements de mode d'affichage
+    window.matchMedia('(display-mode: standalone)').addEventListener('change', (evt) => {
+        checkDisplayMode();
+    });
+    
+    // Ajouter une notification de mise à jour disponible
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            const notification = document.createElement('div');
+            notification.className = 'update-notification';
+            notification.innerHTML = `
+                <span>${currentLang === 'fr' ? 'Mise à jour disponible' : 'Update available'}</span>
+                <button onclick="window.location.reload()">
+                    ${currentLang === 'fr' ? 'Actualiser' : 'Refresh'}
+                </button>
+            `;
+            document.body.appendChild(notification);
+        });
+    }
 });
 
 // Fonction pour créer le message de partage
@@ -330,7 +510,7 @@ function updateCalendar() {
             dayElement.classList.add('clickable');
             
             // Calculer le nombre de push-ups pour ce jour spécifique
-            const dayNumber = calculateDayNumberForDate(dateString);
+            const pushups = day; // Le nombre de push-ups est égal au jour du mois
             
             if (completedDays[dateString]) {
                 dayElement.classList.add('completed');
@@ -341,7 +521,7 @@ function updateCalendar() {
                     delete completedDays[dateString];
                     dayElement.classList.remove('completed');
                 } else {
-                    completedDays[dateString] = dayNumber;
+                    completedDays[dateString] = pushups;
                     dayElement.classList.add('completed');
                 }
                 
@@ -391,7 +571,22 @@ document.getElementById('nextMonth').addEventListener('click', () => {
 
 // Fonction pour calculer le total des push-ups
 function calculateTotalPushups() {
-    return Object.values(completedDays).reduce((total, pushups) => total + pushups, 0);
+    console.log('Calcul du total, completedDays:', completedDays);
+    let total = 0;
+    const values = Object.values(completedDays);
+    console.log('Valeurs à additionner:', values);
+    
+    for (let i = 0; i < values.length; i++) {
+        const pushups = parseInt(values[i]);
+        console.log('Conversion de', values[i], 'en', pushups);
+        if (!isNaN(pushups)) {
+            total += pushups;
+            console.log('Nouveau total:', total);
+        }
+    }
+    
+    console.log('Total final des push-ups:', total);
+    return total;
 }
 
 // Fonction pour mettre à jour l'affichage du total
@@ -400,21 +595,47 @@ function updateTotalDisplay() {
     totalPushups.textContent = calculateTotalPushups();
 }
 
-// Détecter iOS et afficher les instructions d'installation appropriées
-function detectiOS() {
+// Détecter le système d'exploitation et afficher les instructions appropriées
+function detectDevice() {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    const isStandalone = window.navigator.standalone;
-    const iosInstall = document.getElementById('iosInstall');
+    const isAndroid = /Android/.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                        window.navigator.standalone;
     
-    if (isIOS && !isStandalone) {
-        iosInstall.style.display = 'block';
+    const iosInstall = document.getElementById('iosInstall');
+    const androidInstall = document.getElementById('androidInstall');
+    const installButton = document.getElementById('installButton');
+    
+    if (!isStandalone) {
+        if (isIOS) {
+            iosInstall.style.display = 'block';
+            androidInstall.style.display = 'none';
+            installButton.style.display = 'none';
+            // Animation pour iOS
+            setTimeout(() => {
+                iosInstall.classList.add('pulse');
+                setTimeout(() => iosInstall.classList.remove('pulse'), 1000);
+            }, 2000);
+        } else if (isAndroid) {
+            androidInstall.style.display = 'block';
+            iosInstall.style.display = 'none';
+            // Le bouton d'installation natif sera géré par Chrome
+            // Animation pour Android
+            setTimeout(() => {
+                androidInstall.classList.add('pulse');
+                setTimeout(() => androidInstall.classList.remove('pulse'), 1000);
+            }, 2000);
+        }
     } else {
+        // L'application est déjà installée
         iosInstall.style.display = 'none';
+        androidInstall.style.display = 'none';
+        installButton.style.display = 'none';
     }
 }
 
 // Appeler la détection au chargement
-window.addEventListener('load', detectiOS);
+window.addEventListener('load', detectDevice);
 
 // Vérifier si un jour est passé depuis la dernière visite
 function verifierJour() {
