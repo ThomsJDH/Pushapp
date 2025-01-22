@@ -331,35 +331,18 @@ document.querySelectorAll('.social-button').forEach(button => {
     });
 });
 
-// Installation PWA
-let deferredPrompt;
-const installButton = document.getElementById('installButton');
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    // Empêcher Chrome 67 et versions antérieures d'afficher automatiquement l'invite
-    e.preventDefault();
-    // Stocker l'événement pour pouvoir le déclencher plus tard
-    deferredPrompt = e;
-    // Afficher le bouton d'installation
-    installButton.style.display = 'flex';
-});
-
-installButton.addEventListener('click', async () => {
-    if (deferredPrompt) {
-        // Afficher l'invite d'installation
-        deferredPrompt.prompt();
-        // Attendre que l'utilisateur réponde à l'invite
-        const { outcome } = await deferredPrompt.userChoice;
-        // On n'a plus besoin de l'événement
-        deferredPrompt = null;
-        // Cacher le bouton d'installation
-        installButton.style.display = 'none';
+// Détecter iOS et afficher les instructions d'installation appropriées
+function detectiOS() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.navigator.standalone;
+    const iosInstall = document.getElementById('iosInstall');
+    
+    if (isIOS && !isStandalone) {
+        iosInstall.style.display = 'block';
+    } else {
+        iosInstall.style.display = 'none';
     }
-});
+}
 
-window.addEventListener('appinstalled', () => {
-    // Cacher le bouton d'installation
-    installButton.style.display = 'none';
-    // Effacer deferredPrompt
-    deferredPrompt = null;
-});
+// Appeler la détection au chargement
+window.addEventListener('load', detectiOS);

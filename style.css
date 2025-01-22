@@ -391,68 +391,30 @@ button .social-icon {
     text-shadow: 0 0 10px rgba(0, 122, 255, 0.3);
 }
 
-.install-container {
-    margin: 20px 0;
+.ios-install-instructions {
+    text-align: left;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.ios-install-instructions ol {
+    margin: 10px 0 0 20px;
+    padding: 0;
+}
+
+.ios-install-instructions li {
+    margin: 8px 0;
     display: flex;
-    justify-content: center;
-}
-
-.install-button {
-    display: none;
     align-items: center;
-    gap: 8px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
+    gap: 5px;
 }
 
-.install-button:hover {
-    background-color: #45a049;
-}
-
-.install-button svg {
-    width: 20px;
-    height: 20px;
-}
-
-.install-button {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 25px;
-    font-size: 1rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin: 20px auto;
-    transition: all 0.3s ease;
-}
-
-.install-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-}
-
-.install-button i {
-    font-size: 1.2rem;
-}
-
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    text-align: center;
-    background-color: #0d0d0d;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgb(49, 48, 48);
+.share-icon {
+    vertical-align: middle;
+    margin-right: 4px;
 }
 
 /* Styles pour la page de confidentialité */
@@ -497,4 +459,15 @@ button .social-icon {
 .back-button:hover {
     background-color: #0056b3;
     transform: translateY(-2px);
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    background-color: #0d0d0d;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgb(49, 48, 48);
 }
