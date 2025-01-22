@@ -5,7 +5,7 @@ const urlsToCache = [
   '/style.css',
   '/script.js',
   '/icon-192.png',
-  'https://kit.fontawesome.com/your-kit-code.js'
+  '/manifest.json'
 ];
 
 self.addEventListener('install', event => {
@@ -31,22 +31,27 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Ne pas mettre en cache les requêtes chrome-extension
+  if (event.request.url.startsWith('chrome-extension://')) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
         // Vérifie si la requête est pour script.js
         if (event.request.url.endsWith('script.js')) {
           // Pour script.js, toujours aller chercher la dernière version
-          return fetch(event.request).then(response => {
+          return fetch(event.request).then(networkResponse => {
             // Clone la réponse car elle ne peut être utilisée qu'une fois
-            const responseToCache = response.clone();
+            const responseToCache = networkResponse.clone();
             
             caches.open(CACHE_NAME)
               .then(cache => {
                 cache.put(event.request, responseToCache);
               });
 
-            return response;
+            return networkResponse;
           }).catch(() => response);
         }
         
@@ -54,19 +59,19 @@ self.addEventListener('fetch', event => {
         if (response) {
           return response;
         }
-        return fetch(event.request).then(response => {
+        return fetch(event.request).then(networkResponse => {
           // Ne pas mettre en cache les requêtes qui ont échoué
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
+          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+            return networkResponse;
           }
 
-          const responseToCache = response.clone();
+          const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME)
             .then(cache => {
               cache.put(event.request, responseToCache);
             });
 
-          return response;
+          return networkResponse;
         });
       })
   );

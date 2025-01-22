@@ -3,11 +3,13 @@
 
 // Fonction pour obtenir la date locale au format YYYY-MM-DD
 function getLocalDateString() {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    // Utiliser la date locale de l'utilisateur
+    const now = new Date();
+    // Obtenir le décalage horaire en minutes
+    const timeZoneOffset = now.getTimezoneOffset();
+    // Ajuster la date en fonction du fuseau horaire
+    const localDate = new Date(now.getTime() - (timeZoneOffset * 60000));
+    return localDate.toISOString().split('T')[0];
 }
 
 // Initialiser ou récupérer les données sauvegardées
@@ -18,10 +20,16 @@ let completedDays = JSON.parse(localStorage.getItem('completedDays')) || {};
 
 // Calculer le nombre de jours depuis le début
 function calculateDayNumber() {
-    const start = new Date('2025-01-01');
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Réinitialiser les heures pour une comparaison juste
-    const diffTime = today.getTime() - start.getTime();
+    const now = new Date();
+    const timeZoneOffset = now.getTimezoneOffset();
+    const localNow = new Date(now.getTime() - (timeZoneOffset * 60000));
+    const start = new Date(startDate);
+    
+    // Réinitialiser les heures pour une comparaison juste
+    localNow.setHours(0, 0, 0, 0);
+    start.setHours(0, 0, 0, 0);
+    
+    const diffTime = localNow.getTime() - start.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
     return diffDays;
 }
@@ -44,6 +52,11 @@ const totalPushups = document.getElementById('totalPushups');
 function verifierJour() {
     const aujourdhui = getLocalDateString();
     if (aujourdhui !== dernierJour) {
+        console.log('Changement de jour détecté');
+        console.log('Ancien jour:', dernierJour);
+        console.log('Nouveau jour:', aujourdhui);
+        console.log('Fuseau horaire:', Intl.DateTimeFormat().resolvedOptions().timeZone);
+        
         // Réinitialiser la case à cocher pour le nouveau jour
         completedCheckbox.checked = false;
         localStorage.setItem('completedToday', 'false');
