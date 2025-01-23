@@ -44,7 +44,8 @@ const translations = {
         'about-title': 'À propos du Challenge',
         'about-description': 'Relevez le défi des push-ups sur 365 jours ! Commencez doucement et progressez chaque jour pour atteindre vos objectifs de fitness. Une application simple et efficace pour suivre votre progression quotidienne. N\'oubliez pas d\'épingler sur votre écran d\'accueil !',
         'weekdays': ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
-        'install': 'Installer l\'application'
+        'install': 'Installer l\'application',
+        'months': ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
     },
     en: {
         'title': 'Push-ups Challenge',
@@ -67,7 +68,8 @@ const translations = {
         'about-title': 'About the Challenge',
         'about-description': 'Take on the 365-day push-up challenge! Start slowly and progress each day to reach your fitness goals. A simple and effective app to track your daily progress. Don\'t forget to pin it to your home screen!',
         'weekdays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-        'install': 'Install App'
+        'install': 'Install App',
+        'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     }
 };
 
@@ -367,83 +369,85 @@ async function copyToClipboard(text) {
 let currentDate = new Date();
 
 function updateCalendar() {
-    const calendarDays = document.getElementById('calendar-days');
-    const currentMonthElement = document.getElementById('currentMonth');
+    const calendarDiv = document.getElementById('calendar');
+    if (!calendarDiv) return;
+
+    // Vider le calendrier
+    calendarDiv.innerHTML = '';
     
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
+    // Obtenir le premier jour du mois
+    const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
     
-    // Traduire le nom du mois selon la langue actuelle
-    currentMonthElement.textContent = new Date(year, month).toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-US', {
-        month: 'long',
-        year: 'numeric'
-    });
-    
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const startingDay = firstDay.getDay();
-    
-    calendarDays.innerHTML = '';
-    
-    // Mettre à jour les en-têtes des jours de la semaine
-    document.querySelectorAll('.weekday').forEach((element, index) => {
-        element.textContent = translations[currentLang].weekdays[index];
-    });
-    
-    // Jours vides du début du mois
-    for (let i = 0; i < startingDay; i++) {
-        const emptyDay = document.createElement('div');
-        emptyDay.className = 'calendar-day inactive';
-        calendarDays.appendChild(emptyDay);
+    // Mettre à jour le mois affiché
+    const monthElement = document.getElementById('currentMonth');
+    if (monthElement) {
+        const monthNames = translations[currentLang].months || ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+        monthElement.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
     }
     
-    // Jours du mois
+    // Ajouter les jours vides au début
+    for (let i = 0; i < firstDay.getDay(); i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'day empty';
+        calendarDiv.appendChild(emptyDay);
+    }
+    
+    // Ajouter les jours du mois
     for (let day = 1; day <= lastDay.getDate(); day++) {
-        const dayElement = document.createElement('div');
-        dayElement.className = 'calendar-day';
-        dayElement.textContent = day;
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'day';
         
-        const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const daySpan = document.createElement('span');
+        daySpan.textContent = day;
+        dayDiv.appendChild(daySpan);
+        
+        const currentDateString = new Date(currentDate.getFullYear(), currentDate.getMonth(), day).toISOString().split('T')[0];
+        
+        // Vérifier si le jour est complété
+        if (completedDays[currentDateString]) {
+            dayDiv.classList.add('completed');
+        }
+        
+        // Vérifier si c'est aujourd'hui
         const today = getLocalDateString();
-        const clickableDate = new Date(dateString);
-        const currentDate = new Date(today);
+        if (currentDateString === today) {
+            dayDiv.classList.add('today');
+        }
         
-        // Rendre le jour cliquable seulement s'il est dans le passé ou aujourd'hui
-        if (clickableDate <= currentDate) {
-            dayElement.classList.add('clickable');
-            
-            // Calculer le nombre de push-ups pour ce jour spécifique
-            const pushups = day; // Le nombre de push-ups est égal au jour du mois
-            
-            if (completedDays[dateString]) {
-                dayElement.classList.add('completed');
-            }
-            
-            dayElement.addEventListener('click', () => {
-                if (completedDays[dateString]) {
-                    delete completedDays[dateString];
-                    dayElement.classList.remove('completed');
+        // Ajouter l'événement de clic pour les jours passés et aujourd'hui
+        const dateToCheck = new Date(currentDateString);
+        const nowDate = new Date(today);
+        
+        if (dateToCheck <= nowDate) {
+            dayDiv.addEventListener('click', () => {
+                // Basculer l'état complété pour ce jour
+                if (completedDays[currentDateString]) {
+                    delete completedDays[currentDateString];
+                    dayDiv.classList.remove('completed');
                 } else {
-                    completedDays[dateString] = pushups;
-                    dayElement.classList.add('completed');
+                    const dayNumber = calculateDayNumberForDate(currentDateString);
+                    completedDays[currentDateString] = dayNumber;
+                    dayDiv.classList.add('completed');
                 }
                 
+                // Sauvegarder et mettre à jour l'affichage
                 localStorage.setItem('completedDays', JSON.stringify(completedDays));
                 updateTotalDisplay();
                 
                 // Mettre à jour la case à cocher si c'est aujourd'hui
-                if (dateString === today) {
-                    checkbox.checked = !checkbox.checked;
-                    localStorage.setItem('completedToday', checkbox.checked);
+                if (currentDateString === today) {
+                    const checkbox = document.getElementById('completed');
+                    if (checkbox) {
+                        checkbox.checked = completedDays[currentDateString] !== undefined;
+                    }
                 }
             });
+            
+            dayDiv.style.cursor = 'pointer';
         }
         
-        if (dateString === today) {
-            dayElement.classList.add('today');
-        }
-        
-        calendarDays.appendChild(dayElement);
+        calendarDiv.appendChild(dayDiv);
     }
 }
 
@@ -602,3 +606,12 @@ window.addEventListener('load', () => {
         updateCalendar();
     }
 });
+
+// Fonction pour calculer le nombre de jours depuis le début pour une date spécifique
+function calculateDayNumberForDate(dateString) {
+    const start = new Date(startDate);
+    const date = new Date(dateString);
+    const diffTime = Math.abs(date - start);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays + 1;
+}

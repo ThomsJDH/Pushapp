@@ -15,8 +15,7 @@ body {
     padding: 20px;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px 0 rgba(255, 255, 255, 0.089);
+    border-radius: 20px
     text-align: center;
 }
 
@@ -121,13 +120,12 @@ label {
 }
 
 .calendar {
-    background: rgba(255, 255, 255, 0.1);
+    margin-top: 20px;
     padding: 20px;
     border-radius: 20px;
-    margin: 20px auto;
-    max-width: 600px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    background: rgba(255, 255, 255, 0.1);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .calendar-header {
@@ -168,16 +166,17 @@ label {
 }
 
 .weekday {
-    font-weight: bold;
-    color: #0d0d0d;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    padding: 5px;
     text-transform: uppercase;
 }
 
 .days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
+    gap: 7px;
+    width: 100%;
+    color: #0d0d0d;
 }
 
 .day {
@@ -185,11 +184,27 @@ label {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 0.9rem;
     border-radius: 50%;
-    cursor: default;
+    border: 1px solid rgba(77, 77, 77, 0.863);
     background: rgba(255, 255, 255, 0.05);
     transition: all 0.3s ease;
+    padding: 0;
+    position: relative;
+    width: 90%;
+}
+
+.day::before {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+}
+
+.day span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .day.completed {
@@ -204,6 +219,7 @@ label {
 
 .day.empty {
     background: none;
+    border: px solid rgba(179, 179, 179, 0.863);
 }
 
 .social-share {
@@ -857,5 +873,17 @@ label {
     
     .day {
         font-size: 0.9rem;
+    }
+    
+    .calendar {
+        padding: 10px;
+    }
+    
+    .weekday {
+        font-size: 0.7rem;
+    }
+    
+    .day {
+        font-size: 0.8rem;
     }
 }
