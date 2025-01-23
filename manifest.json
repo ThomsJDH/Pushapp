@@ -2,8 +2,8 @@
     "name": "Challenge Push-ups",
     "short_name": "Push-ups",
     "description": "Défi des 365 jours de pompes par Thomas",
-    "start_url": "/?source=pwa",
-    "id": "/?source=pwa",
+    "start_url": "/app.html",
+    "id": "/app.html",
     "display": "standalone",
     "display_override": ["window-controls-overlay", "standalone"],
     "background_color": "#000000",
@@ -42,6 +42,13 @@
             "type": "image/png",
             "form_factor": "narrow",
             "label": "Challenge Push-ups sur mobile"
+        },
+        {
+            "src": "screenshot1.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "platform": "wide",
+            "label": "Vue du compteur"
         }
     ],
     "categories": ["fitness", "health", "lifestyle"],
@@ -52,6 +59,18 @@
         {
             "name": "Aujourd'hui",
             "url": "/?source=shortcut",
+            "description": "Voir le défi du jour",
+            "icons": [
+                {
+                    "src": "icon-96.png",
+                    "sizes": "96x96",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Aujourd'hui",
+            "url": "/app.html?source=shortcut",
             "description": "Voir le défi du jour",
             "icons": [
                 {
