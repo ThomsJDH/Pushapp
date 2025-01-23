@@ -175,7 +175,7 @@ label {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 7px;
-    width: 100%;
+    width: 95%;
     color: #0d0d0d;
 }
 
