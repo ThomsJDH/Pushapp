@@ -223,73 +223,75 @@ label {
     border: px solid rgba(179, 179, 179, 0.863);
 }
 
-.social-share {
-    margin: 20px auto;
-    max-width: 600px;
-    text-align: center;
+.share-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+.share-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.share-options {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    border-radius: 15px;
+    animation: fadeIn 0.3s ease;
+}
+
+.share-options.active {
+    display: flex;
 }
 
 .social-button {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 24px;
-    background: #ff3e3e;
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    font-size: 1.1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
     cursor: pointer;
+    font-size: 0.9rem;
     transition: all 0.3s ease;
-    text-decoration: none;
-    margin: 10px;
 }
 
 .social-button:hover {
-    background: #ff5555;
-    transform: translateY(-2px);
-}
-
-.social-options {
-    display: none;
-    margin-top: 15px;
-}
-
-.social-options.show {
-    display: block;
-}
-
-.copy-button {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.copy-button:hover {
     background: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
 }
 
-.status-notification {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 30px;
-    z-index: 1000;
-    display: none;
+.social-icon {
+    width: 20px;
+    height: 20px;
 }
 
-.status-notification.show {
-    display: block;
-    animation: fadeInOut 3s ease-in-out;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
+
+
 
 @keyframes fadeInOut {
     0% { opacity: 0; }
@@ -476,8 +478,9 @@ label {
 
 .share-container {
     position: relative;
-    display: inline-block;
     margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
 }
 
 .share-button {
@@ -489,6 +492,7 @@ label {
     cursor: pointer;
     display: flex;
     align-items: center;
+    text-align: center;
     gap: 8px;
     font-size: 1rem;
     transition: background-color 0.3s;
@@ -886,5 +890,20 @@ label {
     
     .day {
         font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .share-container {
+        padding: 15px;
+    }
+    
+    .share-button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .share-options {
+        width: 90%;
     }
 }
