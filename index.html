@@ -7,17 +7,90 @@
     <meta name="description" content="Relevez le défi des 365 jours de pompes ! Commencez avec 1 pompe et progressez jour après jour.">
     <meta name="author" content="Thomas">
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1e3c72">
-    <link rel="apple-touch-icon" href="icon-192x192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #fff;
             color: #333;
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('hero-bg.jpg') center/cover;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        .hero-text {
+            font-size: 20vw;
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 0.8;
+            margin: 0;
+            white-space: nowrap;
+            background: url('hero-bg.jpg') center/cover;
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            mix-blend-mode: overlay;
+        }
+
+        .subtitle {
+            font-size: 2em;
+            margin: 20px 0 40px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 20px 50px;
+            background-color: #ff3e3e;
+            color: white;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1.2em;
+        }
+
+        .cta-button:hover {
+            background-color: #ff5555;
+            transform: translateY(-2px);
+        }
+
+        .landing-page {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .about, .faq {
+            background-color: #f5f5f5;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 40px 0;
+        }
+
+        .about h2, .faq h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .faq h3 {
+            color: #333;
+            margin: 20px 0 10px;
         }
 
         .lang-switch {
@@ -44,198 +117,29 @@
             border-radius: 3px;
         }
 
-        #compteur {
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        #compteur h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
-
-        #compteur p {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-
-        #jour {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        #nombre {
-            font-size: 48px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .checkbox-container {
-            margin-top: 20px;
-        }
-
-        .checkbox-container input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-        }
-
-        .stats-container {
-            margin-top: 50px;
-            text-align: center;
-        }
-
-        .total-pushups {
-            margin-bottom: 20px;
-        }
-
-        .total-pushups h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .total-number {
-            font-size: 36px;
-            font-weight: bold;
-        }
-
-        .calendar {
-            margin-top: 20px;
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .calendar-header button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .calendar-month {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .weekdays {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .weekday {
-            font-size: 18px;
-            width: 30px;
-            text-align: center;
-        }
-
-        .days {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
-
-        .day {
-            width: 30px;
-            height: 30px;
-            margin: 5px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .day:hover {
-            background-color: #ccc;
-        }
-
-        .day.active {
-            background-color: #ff3e3e;
-            color: #fff;
-        }
-
-        .social-share {
-            margin-top: 50px;
-            text-align: center;
-        }
-
-        .social-button {
-            background-color: #ff3e3e;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .social-button:hover {
-            background-color: #ff5555;
-        }
-
-        .social-options {
+        .content-fr, .content-en {
             display: none;
-            position: absolute;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 10px;
-            z-index: 1000;
         }
 
-        .social-options button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            padding: 10px;
+        .content-fr.active, .content-en.active {
+            display: block;
         }
 
-        .social-options button:hover {
-            background-color: #ccc;
-        }
-
-        .install-container {
-            margin-top: 50px;
-            text-align: center;
-        }
-
-        .ios-install, .android-install {
-            margin-bottom: 20px;
-        }
-
-        .ios-install h3, .android-install h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .ios-install p, .android-install p {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        .social-icon {
-            width: 20px;
-            height: 20px;
-            margin: 0 10px;
-        }
-
-        #statusNotification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            background-color: #ff3e3e;
-            color: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            display: none;
+        @media (max-width: 768px) {
+            .hero-text {
+                font-size: 15vw;
+            }
+            .subtitle {
+                font-size: 1.2em;
+                padding: 0 20px;
+            }
+            .cta-button {
+                padding: 15px 30px;
+                font-size: 1em;
+            }
+            .landing-page {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -245,89 +149,76 @@
         <button onclick="switchLang('en')">EN</button>
     </div>
 
-    <div id="compteur">
-        <h1 data-i18n="title">Challenge Push-ups</h1>
-        <p data-i18n="created-by">Créé par Thomas</p>
-        <p id="jour" data-i18n="day">Jour</p>
-        <div id="nombre">1</div>
-        <p data-i18n="pushups">push-ups</p>
-        
-        <div class="checkbox-container">
-            <input type="checkbox" id="completed">
-            <label for="completed" data-i18n="completed">Complété aujourd'hui</label>
+    <div class="hero">
+        <h1 class="hero-text">Push<br>Up</h1>
+        <div class="content-fr active">
+            <p class="subtitle">Challenge 365 Jours</p>
+            <a href="app.html" class="cta-button">Commencer le Challenge</a>
+        </div>
+        <div class="content-en">
+            <p class="subtitle">365 Days Challenge</p>
+            <a href="app.html" class="cta-button">Start the Challenge</a>
         </div>
     </div>
 
-    <div class="stats-container">
-        <div class="total-pushups">
-            <h3 data-i18n="total-pushups">Total des push-ups</h3>
-            <div class="total-number" id="totalPushups">0</div>
-        </div>
-        
-        <div class="calendar">
-            <div class="calendar-header">
-                <button id="prevMonth" class="calendar-nav">←</button>
-                <div class="calendar-month" id="currentMonth"></div>
-                <button id="nextMonth" class="calendar-nav">→</button>
+    <div class="landing-page">
+        <div class="content-fr active">
+            <div class="about">
+                <h2>À propos du Challenge</h2>
+                <p>Le Challenge Push-ups 365 Jours est conçu pour vous aider à développer une habitude saine et durable. En commençant avec seulement une pompe par jour et en augmentant progressivement, vous construisez non seulement votre force physique mais aussi votre discipline mentale.</p>
             </div>
-            <div class="weekdays">
-                <div class="weekday">Dim</div>
-                <div class="weekday">Lun</div>
-                <div class="weekday">Mar</div>
-                <div class="weekday">Mer</div>
-                <div class="weekday">Jeu</div>
-                <div class="weekday">Ven</div>
-                <div class="weekday">Sam</div>
+
+            <div class="faq">
+                <h2>Questions Fréquentes</h2>
+                <h3>Comment ça marche ?</h3>
+                <p>Le principe est simple : le jour 1, faites 1 pompe. Le jour 2, faites 2 pompes. Et ainsi de suite jusqu'au jour 365 !</p>
+                
+                <h3>Est-ce que je peux rattraper les jours manqués ?</h3>
+                <p>Bien sûr ! L'application vous permet de marquer les jours précédents comme complétés.</p>
+                
+                <h3>Comment installer l'application ?</h3>
+                <p>Sur votre téléphone, ouvrez l'application dans Chrome (Android) ou Safari (iOS) et suivez les instructions d'installation.</p>
             </div>
-            <div class="days" id="calendar"></div>
+        </div>
+
+        <div class="content-en">
+            <div class="about">
+                <h2>About the Challenge</h2>
+                <p>The 365 Days Push-ups Challenge is designed to help you develop a healthy and sustainable habit. Starting with just one push-up a day and gradually increasing, you build not only your physical strength but also your mental discipline.</p>
+            </div>
+
+            <div class="faq">
+                <h2>Frequently Asked Questions</h2>
+                <h3>How does it work?</h3>
+                <p>The principle is simple: day 1, do 1 push-up. Day 2, do 2 push-ups. And so on until day 365!</p>
+                
+                <h3>Can I catch up on missed days?</h3>
+                <p>Of course! The app allows you to mark previous days as completed.</p>
+                
+                <h3>How to install the app?</h3>
+                <p>On your phone, open the app in Chrome (Android) or Safari (iOS) and follow the installation instructions.</p>
+            </div>
         </div>
     </div>
 
-    <div class="social-share">
-        <button id="shareBtn" class="social-button" data-i18n="share">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="18" cy="5" r="3"></circle>
-                <circle cx="6" cy="12" r="3"></circle>
-                <circle cx="18" cy="19" r="3"></circle>
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-            </svg>
-            Partager ma progression
-        </button>
-        <div id="shareOptions" class="social-options">
-            <button class="copy-button" data-platform="copy" data-i18n="copy">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-                Copier
-            </button>
-        </div>
-    </div>
-
-    <div class="install-container">
-        <div class="ios-install">
-            <h3 data-i18n="ios-install-title">Pour installer l'application sur iOS :</h3>
-            <p>
-                <span data-i18n="ios-install-step1">Appuyez sur</span>
-                <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M16 17l5-5-5-5M19.8 12H9M10 3H4v18h6"/>
-                </svg>
-                <span data-i18n="ios-install-step1-safari">dans Safari</span>
-            </p>
-            <p data-i18n="ios-install-step2">Choisissez "Sur l'écran d'accueil"</p>
-        </div>
-
-        <div class="android-install">
-            <h3 data-i18n="android-install-title">Pour installer l'application sur Android :</h3>
-            <p data-i18n="android-install-step1">1. Dans Chrome, appuyez sur le menu</p>
-            <p data-i18n="android-install-step2">2. Sélectionnez "Installer l'application"</p>
-            <p data-i18n="android-install-step3">3. Suivez les instructions à l'écran</p>
-        </div>
-    </div>
-
-    <div id="statusNotification" class="status-notification"></div>
-
-    <script src="script.js"></script>
+    <script>
+        function switchLang(lang) {
+            // Retirer la classe active de tous les contenus
+            document.querySelectorAll('.content-fr, .content-en').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Ajouter la classe active au contenu de la langue sélectionnée
+            document.querySelectorAll(`.content-${lang}`).forEach(el => {
+                el.classList.add('active');
+            });
+            
+            // Mettre à jour les boutons
+            document.querySelectorAll('.lang-switch button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.lang-switch button:nth-child(${lang === 'fr' ? 1 : 2})`).classList.add('active');
+        }
+    </script>
 </body>
 </html>
