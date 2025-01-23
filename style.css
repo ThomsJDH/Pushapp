@@ -11,11 +11,11 @@ body {
 
 #compteur {
     max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
+    margin: 15px auto;
+    padding: 5px;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
-    border-radius: 20px
+    border-radius: 20px;
     text-align: center;
 }
 
@@ -161,6 +161,7 @@ label {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 5px;
+    max-width: 95%;
     margin-bottom: 10px;
     text-align: center;
 }
@@ -855,7 +856,7 @@ label {
 
 @media (max-width: 768px) {
     #compteur, .stats-container, .calendar, .social-share {
-        margin: 10px;
+        margin: 5px;
         border-radius: 15px;
     }
     
