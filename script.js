@@ -1,5 +1,25 @@
-// Réinitialiser complètement le localStorage
-localStorage.clear();
+// Suppression de la ligne qui réinitialise le localStorage
+// localStorage.clear();
+
+// Initialiser ou récupérer les données sauvegardées
+let startDate = localStorage.getItem('startDate') || '2025-01-01'; // Date de début par défaut
+let nombre = 1;
+let dernierJour = localStorage.getItem('dernierJour') || getLocalDateString();
+let completedDays = JSON.parse(localStorage.getItem('completedDays')) || {};
+
+// Sauvegarder la date de début si elle n'existe pas encore
+if (!localStorage.getItem('startDate')) {
+    localStorage.setItem('startDate', startDate);
+}
+
+// Calculer le nombre de jours depuis le début
+function calculateDayNumber() {
+    const start = new Date(startDate);
+    const today = new Date();
+    const diffTime = Math.abs(today - start);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays + 1;
+}
 
 // Traductions
 const translations = {
@@ -91,158 +111,41 @@ function getLocalDateString() {
     return localDate.toISOString().split('T')[0];
 }
 
-// Initialiser ou récupérer les données sauvegardées
-let startDate = '2025-01-01'; // Date de début corrigée pour 2025
-let nombre = 1;
-let dernierJour = localStorage.getItem('dernierJour') || getLocalDateString();
-let completedDays = JSON.parse(localStorage.getItem('completedDays')) || {};
-
-// Calculer le nombre de jours depuis le début
-function calculateDayNumber() {
-    const now = new Date();
-    const timeZoneOffset = now.getTimezoneOffset();
-    const localNow = new Date(now.getTime() - (timeZoneOffset * 60000));
-    
-    // On utilise directement le jour du mois
-    const day = localNow.getDate();
-    console.log('Jour du mois:', day);
-    
-    return day;
-}
-
-// Calculer le nombre de jours pour une date spécifique
-function calculateDayNumberForDate(date) {
-    const targetDate = new Date(date);
-    return targetDate.getDate();
-}
-
 // Initialisation au chargement de la page
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM chargé, initialisation...');
     
     const nombreElement = document.getElementById('nombre');
     const jourElement = document.getElementById('jour');
-    const completedCheckbox = document.getElementById('completed');
-    const shareBtn = document.getElementById('shareBtn');
-    const shareOptions = document.getElementById('shareOptions');
-
-    console.log('Éléments de partage:', {
-        shareBtn: shareBtn ? 'trouvé' : 'non trouvé',
-        shareOptions: shareOptions ? 'trouvé' : 'non trouvé'
-    });
-
-    // Initialiser l'affichage
+    const checkbox = document.getElementById('completed');
+    
+    // Mettre à jour le nombre de push-ups pour aujourd'hui
     nombre = calculateDayNumber();
     nombreElement.textContent = nombre;
-    jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
     
-    // Initialiser la case à cocher
-    completedCheckbox.checked = localStorage.getItem('completedToday') === 'true';
+    // Vérifier si l'exercice a été complété aujourd'hui
+    const today = getLocalDateString();
+    if (completedDays[today]) {
+        checkbox.checked = true;
+    }
     
-    // Mettre à jour le total des push-ups
+    // Mettre à jour l'affichage
+    translateUI();
+    updateCalendar();
     updateTotalDisplay();
     
-    // Mettre à jour le calendrier
-    updateCalendar();
-    
-    // Initialiser les traductions
-    translateUI();
-    
-    // Initialiser les boutons de langue
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            currentLang = btn.dataset.lang;
-            localStorage.setItem('language', currentLang);
-            translateUI();
-        });
-    });
-    
-    // Gestion de la case à cocher
-    completedCheckbox.addEventListener('change', () => {
+    // Ajouter les écouteurs d'événements
+    checkbox.addEventListener('change', (e) => {
         const today = getLocalDateString();
-        const todayNumber = calculateDayNumber(); // Utiliser le vrai numéro du jour
-        console.log('Jour actuel:', todayNumber);
-        console.log('CompletedDays avant:', completedDays);
-        
-        if (completedCheckbox.checked) {
-            completedDays[today] = todayNumber;
-            console.log('Ajout de', todayNumber, 'push-ups pour', today);
+        if (e.target.checked) {
+            completedDays[today] = nombre;
         } else {
             delete completedDays[today];
-            console.log('Suppression des push-ups pour', today);
         }
-        
-        console.log('CompletedDays après:', completedDays);
         localStorage.setItem('completedDays', JSON.stringify(completedDays));
-        localStorage.setItem('completedToday', completedCheckbox.checked);
-        updateTotalDisplay();
         updateCalendar();
+        updateTotalDisplay();
     });
-
-    // Gestion du partage
-    if (shareBtn && shareOptions) {
-        console.log('Ajout des gestionnaires d\'événements pour le partage');
-        
-        shareBtn.addEventListener('click', (e) => {
-            console.log('Clic sur le bouton de partage');
-            e.stopPropagation();
-            shareOptions.classList.toggle('visible');
-            console.log('Menu de partage visible:', shareOptions.classList.contains('visible'));
-        });
-
-        // Fermer le menu de partage en cliquant ailleurs
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.share-container')) {
-                console.log('Clic en dehors du menu de partage');
-                shareOptions.classList.remove('visible');
-            }
-        });
-
-        // Gestionnaire de partage
-        const copyButton = document.querySelector('[data-platform="copy"]');
-        console.log('Bouton de copie:', copyButton ? 'trouvé' : 'non trouvé');
-        
-        if (copyButton) {
-            copyButton.addEventListener('click', async () => {
-                console.log('Clic sur le bouton de copie');
-                const message = createShareMessage();
-                console.log('Message à copier:', message);
-                
-                try {
-                    const success = await copyToClipboard(message);
-                    console.log('Résultat de la copie:', success ? 'succès' : 'échec');
-                    
-                    // Créer et afficher la notification
-                    const notification = document.createElement('div');
-                    notification.className = 'copy-notification';
-                    notification.textContent = success 
-                        ? (currentLang === 'fr' ? '✅ Texte copié !' : '✅ Text copied!')
-                        : (currentLang === 'fr' ? '❌ Erreur lors de la copie' : '❌ Copy failed');
-                    
-                    document.body.appendChild(notification);
-                    console.log('Notification ajoutée');
-                    
-                    // Animation et suppression de la notification
-                    setTimeout(() => {
-                        notification.classList.add('fade-out');
-                        setTimeout(() => {
-                            document.body.removeChild(notification);
-                            console.log('Notification supprimée');
-                        }, 500);
-                    }, 2000);
-                    
-                    // Fermer le menu de partage
-                    shareOptions.classList.remove('visible');
-                } catch (err) {
-                    console.error('Erreur lors du partage:', err);
-                }
-            });
-        } else {
-            console.error('Bouton de copie non trouvé dans le DOM');
-        }
-    } else {
-        console.error('Éléments de partage non trouvés dans le DOM');
-    }
 
     // Variables pour l'installation PWA
     let deferredPrompt;
@@ -530,8 +433,8 @@ function updateCalendar() {
                 
                 // Mettre à jour la case à cocher si c'est aujourd'hui
                 if (dateString === today) {
-                    completedCheckbox.checked = !completedCheckbox.checked;
-                    localStorage.setItem('completedToday', completedCheckbox.checked);
+                    checkbox.checked = !checkbox.checked;
+                    localStorage.setItem('completedToday', checkbox.checked);
                 }
             });
         }
@@ -655,7 +558,7 @@ function verifierJour() {
         console.log('Changement de mois:', moisChange);
         
         // Réinitialiser la case à cocher pour le nouveau jour
-        completedCheckbox.checked = false;
+        checkbox.checked = false;
         localStorage.setItem('completedToday', 'false');
         
         // Mettre à jour le dernier jour

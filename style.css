@@ -1,31 +1,40 @@
 body {
     margin: 0;
-    padding: 20px;
+    padding: 0;
     min-height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #fff;
-    color: #333;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: #fff;
     box-sizing: border-box;
+    line-height: 1.6;
 }
 
 #compteur {
-    max-width: 500px;
-    margin: 0 auto;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     text-align: center;
 }
 
 #jour {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     margin: 0;
-    opacity: 0.8;
     font-weight: bold;
-    color: white;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 #nombre {
-    font-size: 4rem;
-    margin: 10px 0;
+    font-size: 6rem;
+    margin: 20px 0;
     font-weight: bold;
+    color: #ff3e3e;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 p {
@@ -57,51 +66,248 @@ p[data-i18n="pushups"] {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 12px;
 }
 
 input[type="checkbox"] {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     accent-color: #ff3e3e;
-}
-
-label {
-    font-size: 1.1rem;
     cursor: pointer;
 }
 
-/* Stats Container */
+label {
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #fff;
+}
+
 .stats-container {
     padding: 20px;
-    border-radius: 10px;
-    margin: 20px 0;
-    text-align: center;
-    background-color: #f5f5f5;
+    border-radius: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
 .total-pushups {
     text-align: center;
     margin-bottom: 30px;
     padding: 20px;
-    background: rgba(255, 69, 69, 0.1);
-    border-radius: 12px;
+    background: rgba(255, 62, 62, 0.1);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 62, 62, 0.2);
 }
 
 .total-pushups h3 {
     margin: 0;
-    font-size: 1.2rem;
-    opacity: 0.8;
+    font-size: 1.4rem;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .total-number {
-    font-size: 3rem;
+    font-size: 4rem;
     font-weight: bold;
     color: #ff3e3e;
     margin-top: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Tabs */
+.calendar {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-nav {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px 15px;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+.calendar-nav:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.calendar-month {
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.weekday {
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    border-radius: 50%;
+    cursor: default;
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.day.completed {
+    background: #ff3e3e;
+    color: #fff;
+    font-weight: bold;
+}
+
+.day.today {
+    border: 2px solid #ff3e3e;
+}
+
+.day.empty {
+    background: none;
+}
+
+.social-share {
+    margin: 20px auto;
+    max-width: 600px;
+    text-align: center;
+}
+
+.social-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: #ff3e3e;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    margin: 10px;
+}
+
+.social-button:hover {
+    background: #ff5555;
+    transform: translateY(-2px);
+}
+
+.social-options {
+    display: none;
+    margin-top: 15px;
+}
+
+.social-options.show {
+    display: block;
+}
+
+.copy-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.copy-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.status-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 30px;
+    z-index: 1000;
+    display: none;
+}
+
+.status-notification.show {
+    display: block;
+    animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.lang-switch {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 5px;
+    border-radius: 20px;
+    display: flex;
+    gap: 5px;
+}
+
+.lang-switch button {
+    background: none;
+    border: none;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.lang-switch button.active {
+    background: #ff3e3e;
+}
+
 .tabs {
     display: flex;
     gap: 10px;
@@ -134,7 +340,6 @@ label {
     color: white;
 }
 
-/* Tab Content */
 .tab-content {
     position: relative;
     min-height: 300px;
@@ -151,14 +356,12 @@ label {
     opacity: 1;
 }
 
-/* Chart */
 #progressChart {
     width: 100% !important;
     height: 250px !important;
     margin: 0 auto;
 }
 
-/* Calendar */
 .calendar-container {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
@@ -254,7 +457,6 @@ label {
     cursor: default;
 }
 
-/* Share buttons */
 .share-container {
     position: relative;
     display: inline-block;
@@ -340,7 +542,6 @@ label {
     }
 }
 
-/* Notification de copie */
 .copy-notification {
     position: fixed;
     bottom: 20px;
@@ -430,7 +631,6 @@ label {
     margin-right: 4px;
 }
 
-/* Styles pour la page de confidentialité */
 .privacy-content {
     text-align: left;
     margin: 20px 0;
@@ -519,7 +719,9 @@ label {
 }
 
 .install-button {
-    background: #4CAF50;
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+    transition: all 0.3s ease;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -530,134 +732,6 @@ label {
     gap: 8px;
     font-size: 1rem;
     margin: 0 auto;
-    transition: background-color 0.3s;
-}
-
-.install-button:hover {
-    background: #388E3C;
-}
-
-.ios-install {
-    margin-top: 20px;
-    padding: 15px;
-    background: #f5f5f5;
-    border-radius: 8px;
-    text-align: left;
-    color: #333;
-}
-
-.ios-install h3 {
-    margin: 0 0 10px 0;
-    font-size: 1.1rem;
-    color: #333;
-}
-
-.ios-install p {
-    margin: 8px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #333;
-}
-
-.ios-install .social-icon {
-    vertical-align: middle;
-}
-
-/* Styles pour les notifications de statut */
-.status-notification {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 20px;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    font-size: 0.9rem;
-    z-index: 1000;
-    animation: slideDown 0.3s ease-out;
-}
-
-.status-notification.online {
-    background: rgba(76, 175, 80, 0.9);
-}
-
-.status-notification.offline {
-    background: rgba(255, 152, 0, 0.9);
-}
-
-/* Styles pour la notification de mise à jour */
-.update-notification {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 12px 24px;
-    border-radius: 8px;
-    background: #2196F3;
-    color: white;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    animation: slideUp 0.3s ease-out;
-}
-
-.update-notification button {
-    background: white;
-    color: #2196F3;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
-}
-
-.update-notification button:hover {
-    background: #f0f0f0;
-}
-
-/* Animation pour le mode hors ligne */
-.offline .main-content {
-    opacity: 0.8;
-    filter: grayscale(20%);
-}
-
-/* Animation pulse pour iOS */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-.ios-install.pulse {
-    animation: pulse 1s ease-in-out;
-}
-
-/* Animations pour les notifications */
-@keyframes slideDown {
-    from { transform: translate(-50%, -100%); opacity: 0; }
-    to { transform: translate(-50%, 0); opacity: 1; }
-}
-
-@keyframes slideUp {
-    from { transform: translate(-50%, 100%); opacity: 0; }
-    to { transform: translate(-50%, 0); opacity: 1; }
-}
-
-/* Mode standalone (installé) */
-.standalone-mode .install-container {
-    display: none;
-}
-
-/* Amélioration du bouton d'installation */
-.install-button {
-    background: linear-gradient(45deg, #4CAF50, #45a049);
-    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
-    transition: all 0.3s ease;
 }
 
 .install-button:hover {
@@ -671,7 +745,6 @@ label {
     box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
 }
 
-/* Styles communs pour les instructions d'installation */
 .install-instructions {
     margin-top: 20px;
     padding: 15px;
@@ -700,12 +773,10 @@ label {
     vertical-align: middle;
 }
 
-/* Styles spécifiques pour Android */
 .android-install {
     border-left: 4px solid #3DDC84; /* Couleur verte d'Android */
 }
 
-/* Styles spécifiques pour iOS */
 .ios-install {
     border-left: 4px solid #007AFF; /* Couleur bleue d'iOS */
 }
@@ -735,4 +806,56 @@ label {
     color: #666;
     font-size: 1.2rem;
     margin-bottom: 20px;
+}
+
+.offline .main-content {
+    opacity: 0.8;
+    filter: grayscale(20%);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.ios-install.pulse {
+    animation: pulse 1s ease-in-out;
+}
+
+@keyframes slideDown {
+    from { transform: translate(-50%, -100%); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translate(-50%, 100%); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.standalone-mode .install-container {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    #compteur, .stats-container, .calendar, .social-share {
+        margin: 10px;
+        border-radius: 15px;
+    }
+    
+    #nombre {
+        font-size: 4rem;
+    }
+    
+    .total-number {
+        font-size: 3rem;
+    }
+    
+    .weekday {
+        font-size: 0.8rem;
+    }
+    
+    .day {
+        font-size: 0.9rem;
+    }
 }
