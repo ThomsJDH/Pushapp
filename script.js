@@ -255,28 +255,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Vérifier la connexion internet
     function checkOnlineStatus() {
-        const updateOnlineStatus = () => {
-            const status = navigator.onLine;
-            document.body.classList.toggle('offline', !status);
-            
-            // Afficher une notification de statut
-            const notification = document.createElement('div');
-            notification.className = `status-notification ${status ? 'online' : 'offline'}`;
-            notification.textContent = status 
-                ? (currentLang === 'fr' ? '✅ Connexion rétablie' : '✅ Back online')
-                : (currentLang === 'fr' ? '⚠️ Mode hors ligne' : '⚠️ Offline mode');
-            
-            document.body.appendChild(notification);
-            setTimeout(() => {
-                notification.classList.add('fade-out');
-                setTimeout(() => document.body.removeChild(notification), 500);
-            }, 2000);
-        };
+    const updateOnlineStatus = () => {
+        const status = navigator.onLine;
+        document.body.classList.toggle('offline', !status);
 
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-        updateOnlineStatus(); // Vérifier le statut initial
-    }
+        const notification = document.createElement('div');
+        notification.className = `status-notification ${status ? 'online' : 'offline'}`;
+        notification.textContent = status
+            ? (currentLang === 'fr' ? '✅ Connexion rétablie' : '✅ Back online')
+            : (currentLang === 'fr' ? '⚠️ Mode hors ligne' : '⚠️ Offline mode');
+
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.classList.add('fade-out');
+            setTimeout(() => document.body.removeChild(notification), 500);
+        }, 2000);
+    };
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus(); // Vérifier le statut initial
+}
 
     // Amélioration de la détection iOS
     function detectiOS() {
@@ -337,6 +336,120 @@ function createShareMessage() {
           `✅ ${completedDaysCount} days completed\n` +
           `🎯 Goal: 365 days\n` +
           `#PushupChallenge #Fitness`;
+}
+
+// Navigation du calendrier
+document.addEventListener('DOMContentLoaded', () => {
+    const prevButton = document.getElementById('prevMonth');
+    const nextButton = document.getElementById('nextMonth');
+
+    prevButton.addEventListener('click', () => {
+        const newDate = new Date(currentDate);
+        newDate.setMonth(currentDate.getMonth() - 1);
+        currentDate = newDate;
+        updateCalendar();
+    });
+
+    nextButton.addEventListener('click', () => {
+        const newDate = new Date(currentDate);
+        newDate.setMonth(currentDate.getMonth() + 1);
+        currentDate = newDate;
+        updateCalendar();
+    });
+
+    // Initialiser la langue
+    currentLang = localStorage.getItem('language') || 'fr';
+
+    // Gérer les boutons de langue
+    const langButtons = document.querySelectorAll('[data-lang]');
+    langButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            currentLang = button.getAttribute('data-lang');
+            localStorage.setItem('language', currentLang);
+            translateUI();
+            updateCalendar();
+            langButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+        });
+    });
+
+    // Fonctionnalités de partage
+    const shareButton = document.getElementById('shareBtn');
+    const shareOptions = document.getElementById('shareOptions');
+    const copyButton = document.getElementById('copyButton');
+
+    if (shareButton) {
+        shareButton.addEventListener('click', () => {
+            shareOptions.classList.toggle('active');
+        });
+    }
+
+    if (copyButton) {
+        copyButton.addEventListener('click', async () => {
+            const totalPushups = calculateTotalPushups();
+            const dayNumber = calculateDayNumber();
+
+            const shareText = translations[currentLang].share_text
+                .replace('{dayNumber}', dayNumber)
+                .replace('{totalPushups}', totalPushups);
+
+            try {
+                await navigator.clipboard.writeText(shareText);
+                showNotification(translations[currentLang].copied_success);
+            } catch (err) {
+                console.error('Erreur de copie:', err);
+                showNotification(translations[currentLang].copied_error);
+            }
+
+            shareOptions.classList.remove('active');
+        });
+    }
+});
+
+// Calendrier
+
+function updateCalendar() {
+    const calendarDiv = document.getElementById('calendar');
+    if (!calendarDiv) return;
+
+    const month = currentDate.getMonth();
+    const year = currentDate.getFullYear();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 1; i <= daysInMonth; i++) {
+        const day = new Date(year, month, i);
+        const dayOfWeek = day.getDay();
+
+        const dayDiv = createCalendarDay(day, dayOfWeek);
+        calendarDiv.appendChild(dayDiv);
+    }
+}
+
+function createCalendarDay(day, dayOfWeek) {
+    const dayDiv = document.createElement('div');
+    dayDiv.className = 'day';
+    dayDiv.textContent = day.getDate();
+    // ...
+    return dayDiv;
+}
+
+// Fonction de partage
+function shareContent() {
+    const shareText = 'J\'ai réalisé ' + nombre + ' push-ups aujourd\'hui !';
+    const shareUrl = window.location.href;
+    const shareTitle = 'Challenge des push-ups';
+
+    navigator.share({
+        title: shareTitle,
+        text: shareText,
+        url: shareUrl,
+    })
+    .then(() => {
+        console.log('Contenu partagé avec succès !');
+    })
+    .catch((error) => {
+        console.error('Erreur lors du partage du contenu :', error);
+    });
 }
 
 // Fonction pour copier du texte
@@ -451,30 +564,7 @@ function updateCalendar() {
     }
 }
 
-// Navigation du calendrier
-document.getElementById('prevMonth').addEventListener('click', () => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(newDate.getMonth() - 1);
-    
-    // Vérifier si la nouvelle date est après la date de début
-    const start = new Date(startDate);
-    if (newDate.getTime() >= start.getTime()) {
-        currentDate = newDate;
-        updateCalendar();
-    }
-});
 
-document.getElementById('nextMonth').addEventListener('click', () => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(newDate.getMonth() + 1);
-    
-    // Vérifier si la nouvelle date n'est pas dans le futur
-    const now = new Date();
-    if (newDate.getTime() <= now.getTime()) {
-        currentDate = newDate;
-        updateCalendar();
-    }
-});
 
 // Fonction pour calculer le total des push-ups
 function calculateTotalPushups() {
