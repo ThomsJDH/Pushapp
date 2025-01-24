@@ -310,17 +310,20 @@ document.addEventListener('DOMContentLoaded', () => {
 function createShareMessage() {
     const total = calculateTotalPushups();
     const completedDaysCount = Object.keys(completedDays).length;
-    return currentLang === 'fr' 
-        ? `🏋️‍♂️ Défi Push-ups : Jour ${nombre}\n` +
+    if  (currentLang === 'fr') {
+        return `🏋️‍♂️ Défi Push-ups : Jour ${nombre}\n` +
           `💪 Total : ${total} push-ups\n` +
           `✅ ${completedDaysCount} jours complétés\n` +
           `🎯 Objectif : 365 jours\n` +
-          `#DéfiPushups #Fitness`
-        : `🏋️‍♂️ Push-ups Challenge: Day ${nombre}\n` +
-          `💪 Total: ${total} push-ups\n` +
+          `#DéfiPushups #Fitness`;
+    } else {
+        return `🏋️‍♂️ Challenge Push-ups : Day ${nombre}\n` +
+          `💪 Total : ${total} push-ups\n` +
           `✅ ${completedDaysCount} days completed\n` +
           `🎯 Goal: 365 days\n` +
-          `#PushupChallenge #Fitness`;
+          `#ChallengePushups #Fitness`;
+    }
+
 }
 
 // Navigation du calendrier
