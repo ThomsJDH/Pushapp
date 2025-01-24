@@ -45,10 +45,7 @@ const translations = {
         'about-description': 'Relevez le défi des push-ups sur 365 jours ! Commencez doucement et progressez chaque jour pour atteindre vos objectifs de fitness. Une application simple et efficace pour suivre votre progression quotidienne. N\'oubliez pas d\'épingler sur votre écran d\'accueil !',
         'weekdays': ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
         'install': 'Installer l\'application',
-        'months': ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
-        'share_text': 'J\'ai complété {dayNumber} jours du défi des push-ups et réalisé {totalPushups} push-ups !',
-        'copied_success': 'Texte copié avec succès !',
-        'copied_error': 'Erreur lors de la copie du texte.'
+        'months': ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
     },
     en: {
         'title': 'Push-ups Challenge',
@@ -72,10 +69,7 @@ const translations = {
         'about-description': 'Take on the 365-day push-up challenge! Start slowly and progress each day to reach your fitness goals. A simple and effective app to track your daily progress. Don\'t forget to pin it to your home screen!',
         'weekdays': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
         'install': 'Install App',
-        'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-        'share_text': 'I\'ve completed {dayNumber} days of the push-up challenge and done {totalPushups} push-ups!',
-        'copied_success': 'Text copied successfully!',
-        'copied_error': 'Error copying text.'
+        'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     }
 };
 
@@ -326,62 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(notification);
         });
     }
-    
-    // Fonctionnalités de partage
-    const shareButton = document.getElementById('shareBtn');
-    const shareOptions = document.getElementById('shareOptions');
-    const copyButton = document.getElementById('copyButton');
-    const downloadButton = document.getElementById('downloadButton');
-
-    if (shareButton) {
-        shareButton.addEventListener('click', () => {
-            shareOptions.classList.toggle('active');
-        });
-    }
-
-    if (copyButton) {
-        copyButton.addEventListener('click', async () => {
-            const totalPushups = calculateTotalPushups();
-            const today = getLocalDateString();
-            const dayNumber = calculateDayNumberForDate(today);
-            
-            const shareText = translations[currentLang].share_text
-                .replace('{dayNumber}', dayNumber)
-                .replace('{totalPushups}', totalPushups);
-                
-            try {
-                await navigator.clipboard.writeText(shareText);
-                showNotification(translations[currentLang].copied_success);
-            } catch (err) {
-                showNotification(translations[currentLang].copied_error);
-            }
-            
-            shareOptions.classList.remove('active');
-        });
-    }
-
-    if (downloadButton) {
-        downloadButton.addEventListener('click', () => {
-            // Créer une capture d'écran de la progression
-            html2canvas(document.querySelector('#compteur')).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'pushup-progress.png';
-                link.href = canvas.toDataURL();
-                link.click();
-            });
-            
-            shareOptions.classList.remove('active');
-        });
-    }
-
-    // Fermer les options de partage en cliquant en dehors
-    document.addEventListener('click', (event) => {
-        if (shareOptions && 
-            !shareOptions.contains(event.target) && 
-            !shareButton.contains(event.target)) {
-            shareOptions.classList.remove('active');
-        }
-    });
 });
 
 // Fonction pour créer le message de partage
@@ -676,16 +614,4 @@ function calculateDayNumberForDate(dateString) {
     const diffTime = Math.abs(date - start);
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays + 1;
-}
-
-// Fonction pour afficher une notification
-function showNotification(message) {
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    setTimeout(() => {
-        notification.classList.add('fade-out');
-        setTimeout(() => document.body.removeChild(notification), 500);
-    }, 2000);
 }
