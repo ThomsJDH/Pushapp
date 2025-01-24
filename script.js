@@ -14,8 +14,8 @@ if (!localStorage.getItem('startDate')) {
 
 // Calculer le nombre de jours depuis le début
 function calculateDayNumber() {
-    const start = new Date(startDate);
-    const today = new Date();
+    const start = new Date(2025, 0, 1); // Date de début fixée au 1er janvier 2025
+    const today = new Date(2025, currentDate.getMonth(), currentDate.getDate());
     const diffTime = Math.abs(today - start);
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays + 1;
@@ -165,21 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
         installButton.style.display = 'flex';
     });
 
-    // Gestionnaire de clic pour le bouton d'installation
-    installButton.addEventListener('click', async () => {
-        if (!deferredPrompt) {
-            return;
-        }
-        // Afficher l'invite d'installation
-        deferredPrompt.prompt();
-        // Attendre que l'utilisateur réponde à l'invite
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to the install prompt: ${outcome}`);
-        // On n'a plus besoin de l'invite, on la supprime
-        deferredPrompt = null;
-        // Cacher le bouton d'installation
-        installButton.style.display = 'none';
-    });
 
     // Écouter l'événement appinstalled
     window.addEventListener('appinstalled', (evt) => {
@@ -345,14 +330,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     prevButton.addEventListener('click', () => {
         const newDate = new Date(currentDate);
-        newDate.setMonth(currentDate.getMonth() - 1);
+        if (newDate.getMonth() === 0) { // Si on est en janvier
+            newDate.setMonth(11); // Reste en décembre de la même année
+            newDate.setFullYear(newDate.getFullYear() - 1); // Mais comme on veut rester en 2025, on corrige l'année
+            newDate.setFullYear(2025); // Pour rester en 2025
+        } else {
+            newDate.setMonth(newDate.getMonth() - 1);
+        }
         currentDate = newDate;
         updateCalendar();
     });
 
     nextButton.addEventListener('click', () => {
         const newDate = new Date(currentDate);
-        newDate.setMonth(currentDate.getMonth() + 1);
+        if (newDate.getMonth() === 11) { // Si on est en décembre
+            newDate.setMonth(0); // Reste en décembre de la même année
+            newDate.setFullYear(newDate.getFullYear() + 1 ); // Mais comme on veut rester en 2025, on corrige l'année
+            newDate.setFullYear(2025); // Pour rester en 2025
+        } else {
+            newDate.setMonth(newDate.getMonth() + 1);
+        }
         currentDate = newDate;
         updateCalendar();
     });
@@ -386,71 +383,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (copyButton) {
         copyButton.addEventListener('click', async () => {
-            const totalPushups = calculateTotalPushups();
-            const dayNumber = calculateDayNumber();
+            copyToClipboard(createShareMessage());   
 
-            const shareText = translations[currentLang].share_text
-                .replace('{dayNumber}', dayNumber)
-                .replace('{totalPushups}', totalPushups);
 
-            try {
-                await navigator.clipboard.writeText(shareText);
-                showNotification(translations[currentLang].copied_success);
-            } catch (err) {
-                console.error('Erreur de copie:', err);
-                showNotification(translations[currentLang].copied_error);
-            }
 
             shareOptions.classList.remove('active');
         });
     }
 });
 
-// Calendrier
 
-function updateCalendar() {
-    const calendarDiv = document.getElementById('calendar');
-    if (!calendarDiv) return;
 
-    const month = currentDate.getMonth();
-    const year = currentDate.getFullYear();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    for (let i = 1; i <= daysInMonth; i++) {
-        const day = new Date(year, month, i);
-        const dayOfWeek = day.getDay();
-
-        const dayDiv = createCalendarDay(day, dayOfWeek);
-        calendarDiv.appendChild(dayDiv);
-    }
-}
-
-function createCalendarDay(day, dayOfWeek) {
-    const dayDiv = document.createElement('div');
-    dayDiv.className = 'day';
-    dayDiv.textContent = day.getDate();
-    // ...
-    return dayDiv;
-}
-
-// Fonction de partage
-function shareContent() {
-    const shareText = 'J\'ai réalisé ' + nombre + ' push-ups aujourd\'hui !';
-    const shareUrl = window.location.href;
-    const shareTitle = 'Challenge des push-ups';
-
-    navigator.share({
-        title: shareTitle,
-        text: shareText,
-        url: shareUrl,
-    })
-    .then(() => {
-        console.log('Contenu partagé avec succès !');
-    })
-    .catch((error) => {
-        console.error('Erreur lors du partage du contenu :', error);
-    });
-}
 
 // Fonction pour copier du texte
 async function copyToClipboard(text) {
@@ -489,8 +432,8 @@ function updateCalendar() {
     calendarDiv.innerHTML = '';
     
     // Obtenir le premier jour du mois
-    const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+    const firstDay = new Date(2025, currentDate.getMonth(), 1);
+    const lastDay = new Date(2025, currentDate.getMonth() + 1, 0);
     
     // Mettre à jour le mois affiché
     const monthElement = document.getElementById('currentMonth');
@@ -534,7 +477,7 @@ function updateCalendar() {
         
         if (dateToCheck <= nowDate) {
             dayDiv.addEventListener('click', () => {
-                // Basculer l'état complété pour ce jour
+                // Basculer l'état complète pour ce jour
                 if (completedDays[currentDateString]) {
                     delete completedDays[currentDateString];
                     dayDiv.classList.remove('completed');
@@ -640,16 +583,16 @@ function verifierJour() {
     const maintenant = new Date();
     const dernierJourDate = new Date(dernierJour);
     
-    // Vérifier si nous avons changé de mois
-    const moisChange = maintenant.getMonth() !== dernierJourDate.getMonth() || 
-                      maintenant.getFullYear() !== dernierJourDate.getFullYear();
+    // Créer une date avec l'année 2025 pour la comparaison
+    const today2025 = new Date(2025, maintenant.getMonth(), maintenant.getDate());
+    const dernierJourDate2025 = new Date(2025, dernierJourDate.getMonth(), dernierJourDate.getDate());
     
-    if (aujourdhui !== dernierJour) {
+
+    
+    if (today2025.getTime() !== dernierJourDate2025.getTime()) {
         console.log('Changement de jour détecté');
         console.log('Ancien jour:', dernierJour);
         console.log('Nouveau jour:', aujourdhui);
-        console.log('Fuseau horaire:', Intl.DateTimeFormat().resolvedOptions().timeZone);
-        console.log('Changement de mois:', moisChange);
         
         // Réinitialiser la case à cocher pour le nouveau jour
         checkbox.checked = false;
@@ -663,18 +606,13 @@ function verifierJour() {
         localStorage.setItem('dernierJour', dernierJour);
         localStorage.setItem('nombre', nombre);
         
-        // Si nous avons changé de mois, mettre à jour la date courante du calendrier
-        if (moisChange) {
-            currentDate = new Date();
-        }
+        // Mettre à jour l'affichage
+        const nombreElement = document.getElementById('nombre');
+        const jourElement = document.getElementById('jour');
+        nombreElement.textContent = nombre;
+        jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
+        updateCalendar();
     }
-    
-    // Mettre à jour l'affichage
-    const nombreElement = document.getElementById('nombre');
-    const jourElement = document.getElementById('jour');
-    nombreElement.textContent = nombre;
-    jourElement.textContent = `${translations[currentLang].day} ${nombre}`;
-    updateCalendar();
 }
 
 // Vérifier toutes les heures si un jour est passé
